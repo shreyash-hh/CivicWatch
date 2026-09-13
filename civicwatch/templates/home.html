@@ -1,95 +1,251 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}CivicWatch :: Smart Civic Action & Live Incident Map{% endblock %}
+{% block title %}CivicWatch :: True Patriotism is Civic Action & Live Incident Map{% endblock %}
 
 {% block content %}
 <div class="main-container">
 
-    <!-- Hero Header & Quick Stats -->
-    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
-        <div>
-            <div class="d-flex align-items-center gap-2 mb-1">
-                <span class="badge-category"><i class="fas fa-satellite-dish text-primary me-1"></i> Live Geo-Registry</span>
-                <span class="text-muted" style="font-size: 0.8125rem;">Real-time public grievance resolution feed</span>
-            </div>
-            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Smart Civic Action & Incident Map</h1>
-            <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Report local defects, track volunteer adoptions, and verify community remediations.</p>
+    <!-- 1. Hero Mission Banner (Inspired by The Better India Civic Sense Revolution) -->
+    <section class="civic-hero-section">
+        <div class="hero-mission-tag">
+            <i class="fas fa-flag text-amber"></i> The Civic Action Movement &bull; Everyday Actions Build Our Nation
+        </div>
+        <h1 class="hero-headline">
+            True Patriotism is <span>Civic Action.</span>
+        </h1>
+        <p class="hero-subtitle">
+            When one citizen takes responsibility, an entire neighbourhood sees what's possible. Spot public infrastructure hazards, adopt community fixes, and create verified, lasting change.
+        </p>
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <a href="{% url 'report_violation' %}" class="btn-modern btn-modern-hazard" style="padding: 0.85rem 1.5rem; font-size: 1rem;">
+                <i class="fas fa-plus-circle me-1"></i> Spot & Report a Hazard
+            </a>
+            <a href="#live-map-section" class="btn-modern btn-modern-secondary" style="background: rgba(255, 255, 255, 0.15); color: #FFFFFF; border-color: rgba(255, 255, 255, 0.25); padding: 0.85rem 1.5rem; font-size: 1rem;">
+                <i class="fas fa-map-location-dot me-1"></i> Explore Live Map
+            </a>
+            <a href="{% url 'leaderboard' %}" class="btn-modern btn-modern-secondary" style="background: rgba(255, 255, 255, 0.15); color: #FFFFFF; border-color: rgba(255, 255, 255, 0.25); padding: 0.85rem 1.5rem; font-size: 1rem;">
+                <i class="fas fa-trophy me-1 text-amber"></i> Changemakers
+            </a>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
-            <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary">
-                <i class="fas fa-list-check me-1"></i> Card Grid View
-            </a>
-            <a href="{% url 'report_violation' %}" class="btn-modern btn-modern-hazard">
-                <i class="fas fa-plus-circle me-1"></i> Report an Issue
-            </a>
+        <!-- Live Impact Aggregate Counter -->
+        <div class="hero-stats-grid">
+            <div class="hero-stat-box">
+                <div class="hero-stat-num">{{ total_reports }}</div>
+                <div class="hero-stat-label"><i class="fas fa-bullhorn me-1 text-danger"></i> Grievances Spotted</div>
+            </div>
+            <div class="hero-stat-box">
+                <div class="hero-stat-num">{{ active_in_progress }}</div>
+                <div class="hero-stat-label"><i class="fas fa-screwdriver-wrench me-1 text-warning"></i> Active In-Progress</div>
+            </div>
+            <div class="hero-stat-box">
+                <div class="hero-stat-num">{{ verified_resolutions }}</div>
+                <div class="hero-stat-label"><i class="fas fa-check-double me-1 text-success"></i> Verified Resolutions</div>
+            </div>
+            <div class="hero-stat-box">
+                <div class="hero-stat-num">{{ total_civic_credits }} <span style="font-size: 1rem; font-weight: 600;">pts</span></div>
+                <div class="hero-stat-label"><i class="fas fa-award me-1 text-amber"></i> Civic Credits Earned</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Continuous Action Marquee Ticker -->
+    <div class="civic-marquee">
+        <div class="marquee-track">
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Cleaner Streets</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Safer Roads</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Restored Public Spaces</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> 100% Photographic Proof</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Zero Self-Dealing Integrity</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Verified Digital Certificates</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Community Pride</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Transparent Municipal Governance</span>
+            <!-- Repeated for continuous loop -->
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Cleaner Streets</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Safer Roads</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Restored Public Spaces</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> 100% Photographic Proof</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Zero Self-Dealing Integrity</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Verified Digital Certificates</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Community Pride</span>
+            <span class="marquee-item"><i class="fas fa-circle-check marquee-dot"></i> Transparent Municipal Governance</span>
         </div>
     </div>
 
-    <!-- Live Map Card with Floating Filter Pills -->
-    <div class="modern-card" style="padding: 1rem; margin-bottom: 2rem;">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-            <div class="floating-filter-bar">
-                <button type="button" class="filter-chip active" data-status="all">
-                    <i class="fas fa-layer-group me-1"></i> All Incidents
-                </button>
-                <button type="button" class="filter-chip" data-status="Pending">
-                    <span class="status-indicator-dot dot-pending"></span> Pending Hazards
-                </button>
-                <button type="button" class="filter-chip" data-status="Adopted">
-                    <span class="status-indicator-dot dot-adopted"></span> In Progress
-                </button>
-                <button type="button" class="filter-chip" data-status="Pending Verification">
-                    <span class="status-indicator-dot dot-verification"></span> Under Verification
-                </button>
-                <button type="button" class="filter-chip" data-status="Resolved">
-                    <span class="status-indicator-dot dot-resolved"></span> Resolved & Certified
-                </button>
+    <!-- 3. The 3-Pillar Civic Framework (Spot • Remediate • Celebrate) -->
+    <section class="pillars-section">
+        <div class="section-header-centered">
+            <span class="section-badge">How CivicWatch Works</span>
+            <h2 style="font-size: 1.85rem; margin-bottom: 0.5rem;">From Hazard to Verified Transformation</h2>
+            <p class="text-muted" style="font-size: 0.9375rem;">A trusted public infrastructure cycle ensuring no grievance goes unanswered.</p>
+        </div>
+
+        <div class="pillars-grid">
+            <!-- Pillar 1: Spot & Report -->
+            <div class="pillar-card">
+                <div class="pillar-number">01</div>
+                <div class="pillar-icon-box pillar-icon-spot">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <h3 class="pillar-title">1. Spot & Report</h3>
+                <p class="pillar-desc">
+                    Citizens document infrastructure defects with GPS-located photos. EXIF data is sanitized for privacy, and geo-radius duplicate detection prevents redundancy.
+                </p>
             </div>
 
-            <div id="live-incident-count" class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">
+            <!-- Pillar 2: Adopt & Remediate -->
+            <div class="pillar-card">
+                <div class="pillar-number">02</div>
+                <div class="pillar-icon-box pillar-icon-remediate">
+                    <i class="fas fa-hand-holding-hand"></i>
+                </div>
+                <h3 class="pillar-title">2. Adopt & Remediate</h3>
+                <p class="pillar-desc">
+                    Verified volunteers, NGO teams, and civic workers adopt open incidents from the live map. Anti-self-dealing rules guarantee objective, unconflicted execution.
+                </p>
+            </div>
+
+            <!-- Pillar 3: Verify & Celebrate -->
+            <div class="pillar-card">
+                <div class="pillar-number">03</div>
+                <div class="pillar-icon-box pillar-icon-celebrate">
+                    <i class="fas fa-certificate"></i>
+                </div>
+                <h3 class="pillar-title">3. Verify & Celebrate</h3>
+                <p class="pillar-desc">
+                    Side-by-side Before/After evidence is reviewed. Citizens rate the fix (1-5 stars), resolvers earn civic credits, and tamper-proof digital certificates are issued.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Transformations in Action Showcase (Recent Verified Fixes) -->
+    {% if recent_transformations %}
+    <section class="transformations-section">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+            <div>
+                <span class="section-badge" style="color: var(--status-resolved-solid); background: var(--status-resolved-bg); border-color: var(--status-resolved-border);">
+                    <i class="fas fa-sparkles me-1"></i> Transformations in Action
+                </span>
+                <h2 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Real Community Transformations</h2>
+                <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Verified evidence of local civic problems solved by citizens and volunteers.</p>
+            </div>
+            <a href="{% url 'violation_list' %}?status=Resolved" class="btn-modern btn-modern-secondary">
+                <i class="fas fa-images me-1"></i> View All Resolved Works
+            </a>
+        </div>
+
+        <div class="transformations-grid">
+            {% for item in recent_transformations %}
+                <div class="transformation-card">
+                    <!-- Before & After Split View -->
+                    <div class="transformation-split-view">
+                        <div class="split-photo">
+                            {% if item.image %}
+                                <img src="{{ item.image.url }}" alt="Before {{ item.title }}">
+                            {% else %}
+                                <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:0.75rem;">No Photo</div>
+                            {% endif %}
+                            <span class="split-label-tag">Before</span>
+                        </div>
+                        <div class="split-divider-line"></div>
+                        <div class="split-photo">
+                            {% if item.submission.after_photos.first %}
+                                <img src="{{ item.submission.after_photos.first.image.url }}" alt="After {{ item.title }}">
+                            {% elif item.submission.before_photo %}
+                                <img src="{{ item.submission.before_photo.url }}" alt="After {{ item.title }}">
+                            {% else %}
+                                <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:0.75rem;">Resolved</div>
+                            {% endif %}
+                            <span class="split-label-tag" style="background: rgba(16, 185, 129, 0.9);">After</span>
+                        </div>
+                    </div>
+
+                    <!-- Transformation Details -->
+                    <div class="transformation-body">
+                        <div>
+                            <div class="transformation-meta">
+                                <span class="badge-category" style="font-size: 0.75rem;">{{ item.get_category_display }}</span>
+                                {% if item.submission.rating_count > 0 %}
+                                    <span class="rating-badge">
+                                        <i class="fas fa-star text-amber"></i> {{ item.submission.avg_rating|floatformat:1 }} ({{ item.submission.rating_count }})
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.35rem; color: var(--text-primary);">
+                                {{ item.title|truncatechars:45 }}
+                            </h4>
+                            <p class="text-muted" style="font-size: 0.8125rem; line-height: 1.4; margin-bottom: 0.5rem;">
+                                {{ item.submission.work_description|truncatechars:75 }}
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="resolver-info">
+                                <div class="user-avatar-initials" style="width: 26px; height: 26px; font-size: 11px; background: linear-gradient(135deg, #10B981, #059669);">
+                                    {{ item.adopted_by.username|slice:":1"|upper }}
+                                </div>
+                                <div style="flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    Resolved by <strong>{{ item.adopted_by.username }}</strong>
+                                </div>
+                                <a href="{% url 'violation_detail' item.id %}" class="btn-modern btn-modern-secondary btn-modern-sm" style="padding: 0.25rem 0.6rem;">
+                                    View <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- 5. Interactive Live Map Explorer Section -->
+    <section id="live-map-section" class="mb-5">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div>
+                <span class="badge-category"><i class="fas fa-satellite-dish text-primary me-1"></i> Live Geo-Registry</span>
+                <h2 style="font-size: 1.75rem; margin: 0.25rem 0 0 0;">Live Municipal Hazard Map</h2>
+            </div>
+            <div id="live-incident-count" class="text-muted" style="font-size: 0.875rem; font-weight: 600;">
                 Loading live pins...
             </div>
         </div>
 
-        <div id="live-map-viewport" class="modern-map-frame" style="height: 560px;"></div>
-    </div>
-
-    <!-- Dual Column: Recent Community Incidents & Top Civic Heroes -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
-        
-        <!-- Recent Incidents Feed -->
-        <div class="modern-card" style="margin: 0;">
-            <div class="modern-card-header">
-                <h3 class="card-title-main"><i class="fas fa-clock-rotate-left text-primary"></i> Recent Incident Reports</h3>
-                <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Explore All</a>
+        <div class="modern-card" style="padding: 1rem;">
+            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+                <div class="floating-filter-bar">
+                    <button type="button" class="filter-chip active" data-status="all">
+                        <i class="fas fa-layer-group me-1"></i> All Incidents
+                    </button>
+                    <button type="button" class="filter-chip" data-status="Pending">
+                        <span class="status-indicator-dot dot-pending"></span> Pending Hazards
+                    </button>
+                    <button type="button" class="filter-chip" data-status="Adopted">
+                        <span class="status-indicator-dot dot-adopted"></span> In Progress
+                    </button>
+                    <button type="button" class="filter-chip" data-status="Pending Verification">
+                        <span class="status-indicator-dot dot-verification"></span> Under Verification
+                    </button>
+                    <button type="button" class="filter-chip" data-status="Resolved">
+                        <span class="status-indicator-dot dot-resolved"></span> Resolved & Certified
+                    </button>
+                </div>
             </div>
 
-            <div class="modern-table-container">
-                <table class="modern-table">
-                    <thead>
-                        <tr>
-                            <th>Incident</th>
-                            <th>Category</th>
-                            <th>Status</th>
-                            <th style="text-align: right;">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="home-incident-tbody">
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">Fetching active reports...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+            <div id="live-map-viewport" class="modern-map-frame" style="height: 560px;"></div>
         </div>
+    </section>
 
-        <!-- Verified Organization Spotlight -->
-        <div class="modern-card" style="margin: 0;">
-            <div class="modern-card-header">
-                <h3 class="card-title-main"><i class="fas fa-medal text-warning"></i> Top Community Organizations</h3>
-                <a href="{% url 'leaderboard' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Full Leaderboard</a>
+    <!-- 6. Changemaker Spotlight & Top Organizations -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        <!-- Top Community Organizations -->
+        <div class="modern-card" style="margin: 0; padding: 1.5rem;">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 style="font-size: 1.15rem; margin: 0;"><i class="fas fa-building-ngo text-primary me-2"></i> Verified Partner NGOs</h3>
+                <a href="{% url 'leaderboard' %}" class="btn-modern btn-modern-secondary btn-modern-sm">All Partners</a>
             </div>
 
             <div class="modern-table-container">
@@ -107,22 +263,67 @@
                                 <td>
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="user-avatar-initials" style="background: linear-gradient(135deg, #10B981, #059669);">
-                                            {{ org.username|make_list|first|upper }}
+                                            {{ org.username|slice:":1"|upper }}
                                         </div>
                                         <div>
-                                            <strong>{{ org.username }}</strong>
-                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Verified NGO Partner</div>
+                                            <a href="{% url 'public_profile' org.id %}" style="text-decoration: none; color: var(--text-primary); font-weight: 700;">{{ org.username }}</a>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Verified NGO</div>
                                         </div>
                                     </div>
                                 </td>
-                                <td><span class="badge-status badge-status-resolved"><i class="fas fa-check-circle"></i> Verified</span></td>
+                                <td><span class="status-pill status-pill-resolved"><i class="fas fa-check-circle"></i> Verified</span></td>
                                 <td style="text-align: right;">
-                                    <span class="badge-status badge-status-resolved">{{ org.civic_points }} pts</span>
+                                    <span class="points-pill">{{ org.civic_points }} pts</span>
                                 </td>
                             </tr>
                         {% empty %}
                             <tr>
                                 <td colspan="3" class="text-center text-muted py-4">No verified organizations active yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Top Volunteer Changemakers -->
+        <div class="modern-card" style="margin: 0; padding: 1.5rem;">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h3 style="font-size: 1.15rem; margin: 0;"><i class="fas fa-medal text-amber me-2"></i> Volunteer Changemakers</h3>
+                <a href="{% url 'leaderboard' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Leaderboard</a>
+            </div>
+
+            <div class="modern-table-container">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Volunteer</th>
+                            <th>Rank</th>
+                            <th style="text-align: right;">Civic Credits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for vol in top_volunteers %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="user-avatar-initials" style="background: linear-gradient(135deg, #2563EB, #1D4ED8);">
+                                            {{ vol.username|slice:":1"|upper }}
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'public_profile' vol.id %}" style="text-decoration: none; color: var(--text-primary); font-weight: 700;">{{ vol.username }}</a>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Active Volunteer</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-category">#{{ forloop.counter }}</span></td>
+                                <td style="text-align: right;">
+                                    <span class="points-pill">{{ vol.civic_points }} pts</span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted py-4">No volunteer scores recorded yet.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -145,11 +346,11 @@ document.addEventListener("DOMContentLoaded", function() {
     }).addTo(map);
 
     const statusConfig = {
-        'Pending': { solid: '#EF4444', glow: 'rgba(239, 68, 68, 0.4)', icon: 'fa-triangle-exclamation' },
-        'Adopted': { solid: '#F59E0B', glow: 'rgba(245, 158, 11, 0.4)', icon: 'fa-screwdriver-wrench' },
-        'Pending Verification': { solid: '#3B82F6', glow: 'rgba(59, 130, 246, 0.4)', icon: 'fa-clipboard-check' },
-        'Resolved': { solid: '#10B981', glow: 'rgba(16, 185, 129, 0.4)', icon: 'fa-check' },
-        'Rejected': { solid: '#7A1C1C', glow: 'rgba(122, 28, 28, 0.4)', icon: 'fa-xmark' }
+        'Pending': { solid: '#EF4444', icon: 'fa-triangle-exclamation' },
+        'Adopted': { solid: '#F59E0B', icon: 'fa-screwdriver-wrench' },
+        'Pending Verification': { solid: '#3B82F6', icon: 'fa-clipboard-check' },
+        'Resolved': { solid: '#10B981', icon: 'fa-check' },
+        'Rejected': { solid: '#7A1C1C', icon: 'fa-xmark' }
     };
 
     let allMarkers = [];
@@ -176,26 +377,23 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(res => res.json())
         .then(violations => {
             const countEl = document.getElementById('live-incident-count');
-            if (countEl) countEl.innerText = `${violations.length} active incidents tracked`;
+            if (countEl) countEl.innerText = `${violations.length} active incidents on live map`;
 
-            const tbody = document.getElementById('home-incident-tbody');
-            if (tbody && violations.length > 0) tbody.innerHTML = '';
-
-            violations.forEach((v, index) => {
+            violations.forEach((v) => {
                 if (v.latitude && v.longitude) {
                     const icon = createModernPin(v.status);
                     const marker = L.marker([v.latitude, v.longitude], { icon: icon });
                     marker.violationData = v;
 
-                    const badgeClass = v.status === 'Pending' ? 'badge-status-pending' :
-                                       v.status === 'Adopted' ? 'badge-status-adopted' :
-                                       v.status === 'Pending Verification' ? 'badge-status-verification' :
-                                       v.status === 'Resolved' ? 'badge-status-resolved' : 'badge-status-pending';
+                    const badgeClass = v.status === 'Pending' ? 'status-pill-pending' :
+                                       v.status === 'Adopted' ? 'status-pill-adopted' :
+                                       v.status === 'Pending Verification' ? 'status-pill-verification' :
+                                       v.status === 'Resolved' ? 'status-pill-resolved' : 'status-pill-pending';
 
                     marker.bindPopup(`
-                        <div style="font-family: 'Plus Jakarta Sans', sans-serif; min-width: 200px; padding: 2px;">
-                            <div style="margin-bottom: 6px;">
-                                <span class="badge-status ${badgeClass}" style="font-size: 10px; padding: 2px 6px;">${v.status}</span>
+                        <div style="font-family: 'Plus Jakarta Sans', sans-serif; min-width: 220px; padding: 4px;">
+                            <div style="margin-bottom: 6px; display: flex; gap: 4px; align-items: center; flex-wrap: wrap;">
+                                <span class="status-pill ${badgeClass}" style="font-size: 10px; padding: 2px 6px;">${v.status}</span>
                                 <span class="badge-category" style="font-size: 10px;">${v.category}</span>
                             </div>
                             <h4 style="font-size: 14px; font-weight: 700; margin: 4px 0 8px 0; color: #0F172A;">${v.title}</h4>
@@ -205,22 +403,6 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     marker.addTo(map);
                     allMarkers.push(marker);
-                }
-
-                if (tbody && index < 6) {
-                    const row = document.createElement('tr');
-                    const badgeClass = v.status === 'Pending' ? 'badge-status-pending' :
-                                       v.status === 'Adopted' ? 'badge-status-adopted' :
-                                       v.status === 'Pending Verification' ? 'badge-status-verification' :
-                                       v.status === 'Resolved' ? 'badge-status-resolved' : 'badge-status-pending';
-
-                    row.innerHTML = `
-                        <td><strong>${v.title}</strong></td>
-                        <td><span class="badge-category">${v.category}</span></td>
-                        <td><span class="badge-status ${badgeClass}">${v.status}</span></td>
-                        <td style="text-align: right;"><a href="${v.url}" class="btn-modern btn-modern-secondary btn-modern-sm">View</a></td>
-                    `;
-                    tbody.appendChild(row);
                 }
             });
 
