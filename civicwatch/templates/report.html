@@ -4,18 +4,18 @@
 {% block title %}CivicWatch :: Report Municipal Incident{% endblock %}
 
 {% block content %}
-<div class="civic-container-narrow">
-    <div class="civic-panel">
-        <div class="civic-panel-header">
+<div class="main-container-narrow">
+    <div class="modern-card">
+        <div class="modern-card-header">
             <div>
-                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Official Incident Report Form</h1>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Submit infrastructure defect data with GPS location and photographic evidence for municipal audit.</p>
+                <h1 style="font-size: 1.6rem; margin: 0 0 0.25rem 0;"><i class="fas fa-circle-exclamation text-danger me-2"></i>Report Municipal Incident</h1>
+                <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Submit photographic evidence and GPS coordinates to alert local authorities and community workers.</p>
             </div>
-            <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Cancel</a>
+            <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Cancel</a>
         </div>
 
         {% if form.non_field_errors %}
-            <div class="civic-alert civic-alert-danger">
+            <div class="modern-alert modern-alert-danger">
                 <i class="fas fa-triangle-exclamation"></i>
                 <div>
                     {% for error in form.non_field_errors %}
@@ -28,89 +28,91 @@
         <form method="POST" enctype="multipart/form-data" id="reportForm">
             {% csrf_token %}
 
-            <!-- SECTION 1: PHOTOGRAPHIC EVIDENCE (Mobile First) -->
-            <div class="civic-panel" style="background-color: var(--color-concrete); border: 2px dashed var(--color-asphalt); margin-bottom: 1.5rem; padding: 1.25rem;">
-                <label class="civic-label" style="font-size: var(--font-size-md); font-weight: 700;">
-                    <i class="fas fa-camera me-1"></i> 1. Photographic Evidence
+            <!-- STEP 1: PHOTO DROPZONE -->
+            <div class="modern-card mb-4" style="background-color: #F8FAFC; border: 2px dashed #CBD5E1; padding: 1.5rem; text-align: center;">
+                <label class="modern-label" style="font-size: 1rem; margin-bottom: 0.25rem;">
+                    <i class="fas fa-camera text-primary me-1"></i> 1. Photographic Evidence
                 </label>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin-bottom: 0.75rem;">
-                    Capture on-site photo. Metadata and personal EXIF data are automatically stripped for privacy. Max size: 5MB (JPEG, PNG, WEBP).
+                <p class="text-muted" style="font-size: 0.8125rem; margin-bottom: 1rem;">
+                    Capture photo on-site. Privacy metadata (EXIF/GPS) is automatically sanitized. Max size: 5MB.
                 </p>
-                
-                {{ form.image }}
-                
-                <div id="imagePreviewBox" style="display: none; margin-top: 1rem; text-align: center;">
-                    <img id="imagePreview" src="#" alt="Upload preview" style="max-height: 240px; max-width: 100%; border: 2px solid var(--color-asphalt); border-radius: var(--radius-sm); object-fit: cover;">
+
+                <div style="max-width: 380px; margin: 0 auto;">
+                    {{ form.image }}
+                </div>
+
+                <div id="imagePreviewBox" style="display: none; margin-top: 1.25rem;">
+                    <img id="imagePreview" src="#" alt="Upload preview" style="max-height: 240px; max-width: 100%; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 2px solid var(--border-light); object-fit: cover;">
                 </div>
 
                 {% if form.image.errors %}
-                    <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                    <div style="color: var(--status-pending-text); font-size: 0.8125rem; font-weight: 700; margin-top: 0.5rem;">
                         {{ form.image.errors|join:", " }}
                     </div>
                 {% endif %}
             </div>
 
-            <!-- SECTION 2: GEOGRAPHIC LOCATION (GPS & PIN) -->
-            <div class="civic-panel" style="background-color: var(--color-concrete); margin-bottom: 1.5rem; padding: 1.25rem;">
+            <!-- STEP 2: GEOGRAPHIC LOCATION (GPS & PIN) -->
+            <div class="modern-card mb-4" style="background-color: #F8FAFC; padding: 1.5rem;">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-                    <label class="civic-label" style="font-size: var(--font-size-md); font-weight: 700; margin: 0;">
-                        <i class="fas fa-map-pin me-1"></i> 2. Location & Coordinates
+                    <label class="modern-label" style="font-size: 1rem; margin: 0;">
+                        <i class="fas fa-map-pin text-danger me-1"></i> 2. Precise Incident Location
                     </label>
-                    <button type="button" id="getGPSBtn" class="btn-civic btn-civic-primary btn-civic-sm">
-                        <i class="fas fa-location-crosshairs me-1"></i> Use Current GPS
+                    <button type="button" id="getGPSBtn" class="btn-modern btn-modern-primary btn-modern-sm">
+                        <i class="fas fa-location-crosshairs me-1"></i> Use My GPS Location
                     </button>
                 </div>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin-bottom: 0.75rem;">
-                    Drag the pin on the map to mark the exact defect location, or tap "Use Current GPS".
+                <p class="text-muted" style="font-size: 0.8125rem; margin-bottom: 0.75rem;">
+                    Drag the map marker to the exact spot or tap the GPS button.
                 </p>
 
-                <div id="report-map" class="civic-map-report-frame" style="height: 280px;"></div>
+                <div id="report-map" class="modern-map-frame" style="height: 280px; border-radius: var(--radius-md);"></div>
 
                 {{ form.latitude.as_hidden }}
                 {{ form.longitude.as_hidden }}
 
-                <div class="civic-form-group" style="margin-top: 1rem; margin-bottom: 0;">
-                    <label for="id_location" class="civic-label">Street Address / Landmark / Ward:</label>
+                <div class="modern-form-group" style="margin-top: 1rem; margin-bottom: 0;">
+                    <label for="id_location" class="modern-label">Street Address / Landmark:</label>
                     {{ form.location }}
                     {% if form.location.errors %}
-                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                        <div style="color: var(--status-pending-text); font-size: 0.8125rem; font-weight: 700; margin-top: 0.25rem;">
                             {{ form.location.errors|join:", " }}
                         </div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- SECTION 3: INCIDENT CLASSIFICATION & DETAILS -->
-            <div class="civic-panel" style="background-color: var(--color-surface); margin-bottom: 1.5rem; padding: 1.25rem;">
-                <label class="civic-label" style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: 0.75rem;">
-                    <i class="fas fa-list-check me-1"></i> 3. Incident Classification & Details
+            <!-- STEP 3: CATEGORY & DESCRIPTION -->
+            <div class="modern-card mb-4" style="padding: 1.5rem;">
+                <label class="modern-label" style="font-size: 1rem; margin-bottom: 1rem;">
+                    <i class="fas fa-list-check text-primary me-1"></i> 3. Incident Details
                 </label>
 
-                <div class="civic-form-group">
-                    <label for="id_category" class="civic-label">Category of Defect / Hazard:</label>
+                <div class="modern-form-group">
+                    <label for="id_category" class="modern-label">Defect Category:</label>
                     {{ form.category }}
                     {% if form.category.errors %}
-                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                        <div style="color: var(--status-pending-text); font-size: 0.8125rem; font-weight: 700; margin-top: 0.25rem;">
                             {{ form.category.errors|join:", " }}
                         </div>
                     {% endif %}
                 </div>
 
-                <div class="civic-form-group">
-                    <label for="id_title" class="civic-label">Summary Title:</label>
+                <div class="modern-form-group">
+                    <label for="id_title" class="modern-label">Summary Title:</label>
                     {{ form.title }}
                     {% if form.title.errors %}
-                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                        <div style="color: var(--status-pending-text); font-size: 0.8125rem; font-weight: 700; margin-top: 0.25rem;">
                             {{ form.title.errors|join:", " }}
                         </div>
                     {% endif %}
                 </div>
 
-                <div class="civic-form-group">
-                    <label for="id_description" class="civic-label">Technical Description & Observed Hazards:</label>
+                <div class="modern-form-group">
+                    <label for="id_description" class="modern-label">Detailed Description & Safety Hazards:</label>
                     {{ form.description }}
                     {% if form.description.errors %}
-                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                        <div style="color: var(--status-pending-text); font-size: 0.8125rem; font-weight: 700; margin-top: 0.25rem;">
                             {{ form.description.errors|join:", " }}
                         </div>
                     {% endif %}
@@ -118,15 +120,9 @@
             </div>
 
             <!-- SUBMIT BUTTON -->
-            <div>
-                <button type="submit" class="btn-civic btn-civic-hazard btn-civic-lg btn-civic-full" style="padding: 0.85rem;">
-                    <i class="fas fa-file-signature me-1"></i> Submit Official Incident Report
-                </button>
-                <div class="civic-help-text text-center" style="margin-top: 0.5rem;">
-                    By submitting, this report is logged to the public civic audit registry.
-                </div>
-            </div>
-
+            <button type="submit" class="btn-modern btn-modern-hazard btn-modern-lg btn-modern-full" style="padding: 0.9rem;">
+                <i class="fas fa-paper-plane me-2"></i> Submit Official Incident Report
+            </button>
         </form>
     </div>
 </div>
@@ -135,7 +131,6 @@
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Image Preview
     const imageInput = document.getElementById('id_image');
     const previewBox = document.getElementById('imagePreviewBox');
     const previewImg = document.getElementById('imagePreview');
@@ -153,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Leaflet Pin Dropper
     const latInput = document.getElementById('id_latitude');
     const lngInput = document.getElementById('id_longitude');
     const locInput = document.getElementById('id_location');
@@ -168,22 +162,17 @@ document.addEventListener("DOMContentLoaded", function() {
     }).addTo(reportMap);
 
     const pinIcon = L.divIcon({
-        className: 'custom-leaflet-marker',
-        html: `<div style="
-            background-color: #C8102E;
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            border: 2px solid #FFFFFF;
-            box-shadow: 0 0 0 2px #2B2B2B;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #FFFFFF;
-            font-size: 12px;
-        "><i class="fas fa-location-crosshairs"></i></div>`,
-        iconSize: [26, 26],
-        iconAnchor: [13, 13]
+        className: 'custom-modern-pin',
+        html: `
+            <div class="pulse-marker-wrapper">
+                <div class="pulse-marker-glow" style="background-color: #EF4444;"></div>
+                <div class="pulse-marker-icon" style="background-color: #EF4444;">
+                    <i class="fas fa-location-crosshairs"></i>
+                </div>
+            </div>
+        `,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
     });
 
     let marker = L.marker([defaultLat, defaultLng], {
@@ -194,8 +183,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function updateCoordinates(lat, lng) {
         latInput.value = lat.toFixed(6);
         lngInput.value = lng.toFixed(6);
-        
-        // Reverse Geocoding via Nominatim
+
         fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
             .then(res => res.json())
             .then(data => {
@@ -206,7 +194,6 @@ document.addEventListener("DOMContentLoaded", function() {
             .catch(() => {});
     }
 
-    // Set initial values if not set
     if (!latInput.value || !lngInput.value) {
         updateCoordinates(defaultLat, defaultLng);
     }
@@ -221,11 +208,10 @@ document.addEventListener("DOMContentLoaded", function() {
         updateCoordinates(e.latlng.lat, e.latlng.lng);
     });
 
-    // GPS Button
     const gpsBtn = document.getElementById('getGPSBtn');
     if (gpsBtn && navigator.geolocation) {
         gpsBtn.addEventListener('click', function() {
-            gpsBtn.innerText = "Locating...";
+            gpsBtn.innerText = "Acquiring GPS...";
             navigator.geolocation.getCurrentPosition(
                 function(pos) {
                     const userLat = pos.coords.latitude;
@@ -233,11 +219,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     reportMap.setView([userLat, userLng], 16);
                     marker.setLatLng([userLat, userLng]);
                     updateCoordinates(userLat, userLng);
-                    gpsBtn.innerHTML = '<i class="fas fa-location-crosshairs me-1"></i> GPS Locked';
+                    gpsBtn.innerHTML = '<i class="fas fa-check-circle me-1"></i> GPS Locked';
                 },
                 function(err) {
-                    alert("Unable to retrieve GPS location. Please drag the pin on the map.");
-                    gpsBtn.innerHTML = '<i class="fas fa-location-crosshairs me-1"></i> Use Current GPS';
+                    alert("Could not retrieve GPS location. Please drag the marker on the map.");
+                    gpsBtn.innerHTML = '<i class="fas fa-location-crosshairs me-1"></i> Use My GPS Location';
                 },
                 { enableHighAccuracy: true, timeout: 8000 }
             );

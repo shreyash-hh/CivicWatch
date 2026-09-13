@@ -1,38 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}CivicWatch :: Incident Registry{% endblock %}
+{% block title %}CivicWatch :: Incident Registry & Grievance Feed{% endblock %}
 
 {% block content %}
-<div class="civic-container">
+<div class="main-container">
 
-    <!-- Header & Switch to Map -->
-    <div class="civic-panel" style="padding: 1rem 1.25rem; margin-bottom: 1rem;">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div>
-                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Municipal Incident Registry</h1>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Comprehensive database of citizen-reported infrastructure grievances and remediation status.</p>
+    <!-- Header Panel -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge-category"><i class="fas fa-list-check text-primary me-1"></i> Public Registry</span>
+                <span class="text-muted" style="font-size: 0.8125rem;">All reported municipal issues</span>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <a href="{% url 'map' %}" class="btn-civic btn-civic-secondary btn-civic-sm">
-                    <i class="fas fa-map-location-dot me-1"></i> Switch to Live Map View
-                </a>
-                <a href="{% url 'report_violation' %}" class="btn-civic btn-civic-hazard btn-civic-sm">
-                    <i class="fas fa-circle-exclamation me-1"></i> Report Incident
-                </a>
-            </div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Incident Registry Feed</h1>
+            <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Browse and filter community-reported infrastructure defects and track their real-time resolution status.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'map' %}" class="btn-modern btn-modern-secondary">
+                <i class="fas fa-map-location-dot me-1"></i> Live Map View
+            </a>
+            <a href="{% url 'report_violation' %}" class="btn-modern btn-modern-hazard">
+                <i class="fas fa-plus-circle me-1"></i> Report Issue
+            </a>
         </div>
     </div>
 
-    <!-- Search & Filter Bar -->
-    <div class="civic-panel" style="background-color: var(--color-concrete); padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
+    <!-- Search & Filter Controls -->
+    <div class="modern-card" style="padding: 1.25rem; margin-bottom: 1.75rem;">
         <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
-            <div style="flex: 2; min-width: 200px;">
-                <input type="text" name="search" placeholder="Search by incident title or keywords..." class="civic-input" value="{{ request.GET.search }}">
+            <div style="flex: 2; min-width: 220px;">
+                <input type="text" name="search" placeholder="Search by title, location, or keyword..." class="modern-input" value="{{ request.GET.search }}">
             </div>
 
-            <div style="flex: 1; min-width: 160px;">
-                <select name="category" class="civic-select">
+            <div style="flex: 1; min-width: 170px;">
+                <select name="category" class="modern-select">
                     <option value="">All Categories</option>
                     {% for cat_val, cat_name in categories %}
                         <option value="{{ cat_val }}" {% if request.GET.category == cat_val %}selected{% endif %}>{{ cat_name }}</option>
@@ -40,8 +43,8 @@
                 </select>
             </div>
 
-            <div style="flex: 1; min-width: 140px;">
-                <select name="status" class="civic-select">
+            <div style="flex: 1; min-width: 150px;">
+                <select name="status" class="modern-select">
                     <option value="">All Statuses</option>
                     {% for stat_val, stat_name in statuses %}
                         <option value="{{ stat_val }}" {% if request.GET.status == stat_val %}selected{% endif %}>{{ stat_name }}</option>
@@ -49,88 +52,93 @@
                 </select>
             </div>
 
-            <button type="submit" class="btn-civic btn-civic-primary">
-                <i class="fas fa-filter me-1"></i> Apply Filter
+            <button type="submit" class="btn-modern btn-modern-primary">
+                <i class="fas fa-filter me-1"></i> Filter
             </button>
             
             {% if request.GET.search or request.GET.category or request.GET.status %}
-                <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary">Clear</a>
+                <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary">Clear</a>
             {% endif %}
         </form>
     </div>
 
-    <!-- Incident Cards Grid -->
-    <div class="violation-card-grid">
+    <!-- Modern Incident Card Grid -->
+    <div class="incident-grid">
         {% for v in page_obj %}
-            <div class="violation-card">
-                <div class="violation-card-media">
+            <div class="incident-card">
+                <div class="incident-media">
                     {% if v.image %}
-                        <img src="{{ v.image.url }}" alt="{{ v.title }}" class="violation-card-img">
+                        <img src="{{ v.image.url }}" alt="{{ v.title }}" class="incident-img">
                     {% else %}
-                        <div class="d-flex align-items-center justify-content-center h-100 text-muted" style="font-size: var(--font-size-xs);">
-                            <i class="fas fa-camera-slash me-1"></i> No image attached
+                        <div class="d-flex align-items-center justify-content-center h-100 text-muted" style="font-size: 0.8125rem;">
+                            <i class="fas fa-camera-slash me-1"></i> No photograph attached
                         </div>
                     {% endif %}
-                    
-                    <div style="position: absolute; top: 8px; left: 8px;">
+
+                    <!-- Floating Status Pill Overlay -->
+                    <div class="incident-status-overlay">
                         {% if v.status == 'Pending' %}
-                            <span class="status-badge status-badge-pending">Hazard: Pending</span>
+                            <span class="badge-status badge-status-pending"><span class="status-indicator-dot dot-pending"></span> Pending</span>
                         {% elif v.status == 'Adopted' %}
-                            <span class="status-badge status-badge-adopted">Adopted</span>
+                            <span class="badge-status badge-status-adopted"><span class="status-indicator-dot dot-adopted"></span> In Progress</span>
                         {% elif v.status == 'Pending Verification' %}
-                            <span class="status-badge status-badge-verification">In Verification</span>
+                            <span class="badge-status badge-status-verification"><span class="status-indicator-dot dot-verification"></span> Verification</span>
                         {% elif v.status == 'Resolved' %}
-                            <span class="status-badge status-badge-resolved">Resolved</span>
+                            <span class="badge-status badge-status-resolved"><span class="status-indicator-dot dot-resolved"></span> Resolved</span>
                         {% else %}
-                            <span class="status-badge status-badge-rejected">{{ v.status }}</span>
+                            <span class="badge-status badge-status-pending">{{ v.status }}</span>
                         {% endif %}
                     </div>
                 </div>
 
-                <div class="violation-card-body">
-                    <div class="d-flex align-items-center gap-2 mb-1">
-                        <span class="category-tag">#{{ v.id }}</span>
-                        <span class="category-tag">{{ v.get_category_display }}</span>
+                <div class="incident-body">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="badge-category">#{{ v.id }}</span>
+                        <span class="badge-category">{{ v.get_category_display }}</span>
                     </div>
 
-                    <h3 class="violation-card-title">{{ v.title }}</h3>
-                    <p class="violation-card-desc">{{ v.description }}</p>
+                    <h3 class="incident-title">{{ v.title }}</h3>
+                    <p class="incident-desc">{{ v.description }}</p>
 
-                    <div class="violation-card-footer">
+                    <div class="incident-footer">
                         <div>
-                            <i class="fas fa-location-dot me-1"></i> {{ v.location|truncatechars:28 }}
+                            <i class="fas fa-location-dot text-primary me-1"></i> {{ v.location|truncatechars:26 }}
                         </div>
                         <div>{{ v.created_at|date:"M d, Y" }}</div>
                     </div>
 
-                    <div style="margin-top: 0.75rem;">
-                        <a href="{% url 'violation_detail' v.id %}" class="btn-civic btn-civic-secondary btn-civic-sm btn-civic-full">
-                            Inspect Incident
+                    <div style="margin-top: 0.85rem;">
+                        <a href="{% url 'violation_detail' v.id %}" class="btn-modern btn-modern-secondary btn-modern-sm btn-modern-full">
+                            Inspect Full Record
                         </a>
                     </div>
                 </div>
             </div>
         {% empty %}
-            <div class="civic-panel text-center" style="grid-column: 1 / -1; padding: 3rem 1rem;">
+            <div class="modern-card text-center" style="grid-column: 1 / -1; padding: 3.5rem 1.5rem;">
                 <i class="fas fa-magnifying-glass fa-3x text-muted mb-3" style="display:block;"></i>
-                <h3 style="font-size: var(--font-size-md);">No incidents matching your filter criteria.</h3>
-                <p class="text-muted" style="font-size: var(--font-size-sm);">Try clearing the category or status filter to view all recorded municipal reports.</p>
-                <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Reset Filters</a>
+                <h3>No incident reports found</h3>
+                <p class="text-muted" style="max-width: 420px; margin: 0 auto 1.5rem auto;">Try resetting your filters or search keywords to view the complete public registry.</p>
+                <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Reset All Filters</a>
             </div>
         {% endfor %}
     </div>
 
     <!-- Pagination -->
     {% if page_obj.has_other_pages %}
-        <div class="d-flex align-items-center justify-content-center gap-2" style="margin-top: 2rem;">
+        <div class="d-flex align-items-center justify-content-center gap-2" style="margin-top: 2.5rem;">
             {% if page_obj.has_previous %}
-                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="btn-civic btn-civic-secondary btn-civic-sm">Previous</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="btn-modern btn-modern-secondary btn-modern-sm">
+                    <i class="fas fa-chevron-left me-1"></i> Previous
+                </a>
             {% endif %}
 
-            <span class="category-tag" style="padding: 0.4rem 0.75rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            <span class="badge-category" style="padding: 0.45rem 0.85rem;">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
 
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="btn-civic btn-civic-secondary btn-civic-sm">Next</a>
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" class="btn-modern btn-modern-secondary btn-modern-sm">
+                    Next <i class="fas fa-chevron-right ms-1"></i>
+                </a>
             {% endif %}
         </div>
     {% endif %}

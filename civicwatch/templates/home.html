@@ -1,101 +1,128 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}CivicWatch :: Live Incident Map & Public Registry{% endblock %}
+{% block title %}CivicWatch :: Smart Civic Action & Live Incident Map{% endblock %}
 
 {% block content %}
-<!-- Live Status Bar -->
-<div class="civic-status-bar">
-    <div class="civic-status-bar-inner">
-        <div class="d-flex align-items-center gap-3">
-            <span><i class="fas fa-tower-broadcast me-1"></i> LIVE INCIDENT REGISTRY</span>
-        </div>
-        <div class="status-metric-group">
-            <span class="status-metric-item"><span class="status-dot status-dot-pending"></span> Hazard Pending</span>
-            <span class="status-metric-item"><span class="status-dot status-dot-adopted"></span> In Progress</span>
-            <span class="status-metric-item"><span class="status-dot status-dot-verification"></span> Verification</span>
-            <span class="status-metric-item"><span class="status-dot status-dot-resolved"></span> Resolved & Certified</span>
-        </div>
-    </div>
-</div>
+<div class="main-container">
 
-<div class="civic-container">
-    <!-- Map Control & Overview Toolbar -->
-    <div class="civic-panel" style="margin-bottom: 1rem; padding: 0.85rem 1.25rem;">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div>
-                <h1 style="font-size: var(--font-size-lg); margin-bottom: 0.2rem;">Public Infrastructure Map</h1>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Interactive real-time map of municipal infrastructure defects and verified community resolutions.</p>
+    <!-- Hero Header & Quick Stats -->
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge-category"><i class="fas fa-satellite-dish text-primary me-1"></i> Live Geo-Registry</span>
+                <span class="text-muted" style="font-size: 0.8125rem;">Real-time public grievance resolution feed</span>
             </div>
-            <div class="d-flex gap-2">
-                <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">
-                    <i class="fas fa-table-list me-1"></i> Switch to List View
-                </a>
-                <a href="{% url 'report_violation' %}" class="btn-civic btn-civic-hazard btn-civic-sm">
-                    <i class="fas fa-circle-exclamation me-1"></i> Report Defect
-                </a>
-            </div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Smart Civic Action & Incident Map</h1>
+            <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Report local defects, track volunteer adoptions, and verify community remediations.</p>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary">
+                <i class="fas fa-list-check me-1"></i> Card Grid View
+            </a>
+            <a href="{% url 'report_violation' %}" class="btn-modern btn-modern-hazard">
+                <i class="fas fa-plus-circle me-1"></i> Report an Issue
+            </a>
         </div>
     </div>
 
-    <!-- Live Leaflet Map Container -->
-    <div class="civic-panel" style="padding: 0.5rem; margin-bottom: 1.5rem;">
-        <div id="civic-live-map" class="civic-map-frame"></div>
+    <!-- Live Map Card with Floating Filter Pills -->
+    <div class="modern-card" style="padding: 1rem; margin-bottom: 2rem;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div class="floating-filter-bar">
+                <button type="button" class="filter-chip active" data-status="all">
+                    <i class="fas fa-layer-group me-1"></i> All Incidents
+                </button>
+                <button type="button" class="filter-chip" data-status="Pending">
+                    <span class="status-indicator-dot dot-pending"></span> Pending Hazards
+                </button>
+                <button type="button" class="filter-chip" data-status="Adopted">
+                    <span class="status-indicator-dot dot-adopted"></span> In Progress
+                </button>
+                <button type="button" class="filter-chip" data-status="Pending Verification">
+                    <span class="status-indicator-dot dot-verification"></span> Under Verification
+                </button>
+                <button type="button" class="filter-chip" data-status="Resolved">
+                    <span class="status-indicator-dot dot-resolved"></span> Resolved & Certified
+                </button>
+            </div>
+
+            <div id="live-incident-count" class="text-muted" style="font-size: 0.8125rem; font-weight: 600;">
+                Loading live pins...
+            </div>
+        </div>
+
+        <div id="live-map-viewport" class="modern-map-frame" style="height: 560px;"></div>
     </div>
 
-    <!-- Dual Column: Recent Incident Feed & Impact Ledger -->
-    <div class="row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+    <!-- Dual Column: Recent Community Incidents & Top Civic Heroes -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem;">
         
-        <!-- Recent Incidents -->
-        <div class="civic-panel" style="margin-bottom: 0;">
-            <div class="civic-panel-header">
-                <h3 class="civic-panel-title"><i class="fas fa-clock-rotate-left"></i> Recent Incident Reports</h3>
-                <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">View All</a>
+        <!-- Recent Incidents Feed -->
+        <div class="modern-card" style="margin: 0;">
+            <div class="modern-card-header">
+                <h3 class="card-title-main"><i class="fas fa-clock-rotate-left text-primary"></i> Recent Incident Reports</h3>
+                <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Explore All</a>
             </div>
-            <div id="recent-reports-container" class="civic-table-container">
-                <table class="civic-table">
+
+            <div class="modern-table-container">
+                <table class="modern-table">
                     <thead>
                         <tr>
                             <th>Incident</th>
                             <th>Category</th>
                             <th>Status</th>
-                            <th>Action</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
-                    <tbody id="recent-reports-tbody">
+                    <tbody id="home-incident-tbody">
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-3">Loading live incident feed...</td>
+                            <td colspan="4" class="text-center text-muted py-4">Fetching active reports...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <!-- Public Impact Roll -->
-        <div class="civic-panel" style="margin-bottom: 0;">
-            <div class="civic-panel-header">
-                <h3 class="civic-panel-title"><i class="fas fa-award"></i> Verified Civic Organizations</h3>
-                <a href="{% url 'leaderboard' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Full Registry</a>
+        <!-- Verified Organization Spotlight -->
+        <div class="modern-card" style="margin: 0;">
+            <div class="modern-card-header">
+                <h3 class="card-title-main"><i class="fas fa-medal text-warning"></i> Top Community Organizations</h3>
+                <a href="{% url 'leaderboard' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Full Leaderboard</a>
             </div>
-            <div class="civic-table-container">
-                <table class="civic-table">
+
+            <div class="modern-table-container">
+                <table class="modern-table">
                     <thead>
                         <tr>
-                            <th>Entity Name</th>
-                            <th>Role</th>
-                            <th>Impact Points</th>
+                            <th>Organization</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Impact Points</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for org in top_orgs %}
                             <tr>
-                                <td><strong>{{ org.username }}</strong></td>
-                                <td><span class="category-tag">Organization / NGO</span></td>
-                                <td><strong>{{ org.civic_points }} pts</strong></td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="user-avatar-initials" style="background: linear-gradient(135deg, #10B981, #059669);">
+                                            {{ org.username|make_list|first|upper }}
+                                        </div>
+                                        <div>
+                                            <strong>{{ org.username }}</strong>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Verified NGO Partner</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge-status badge-status-resolved"><i class="fas fa-check-circle"></i> Verified</span></td>
+                                <td style="text-align: right;">
+                                    <span class="badge-status badge-status-resolved">{{ org.civic_points }} pts</span>
+                                </td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-muted text-center py-3">No verified organizations registered yet.</td>
+                                <td colspan="3" class="text-center text-muted py-4">No verified organizations active yet.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -104,113 +131,122 @@
         </div>
 
     </div>
+
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Initialize Leaflet Map
-    const map = L.map('civic-live-map').setView([18.5204, 73.8567], 12);
+    const map = L.map('live-map-viewport').setView([18.5204, 73.8567], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    // Status Color Map
-    const statusColors = {
-        'Pending': '#C8102E',
-        'Adopted': '#E8A33D',
-        'Pending Verification': '#3A5A78',
-        'Resolved': '#2D6A4F',
-        'Rejected': '#7A1C1C'
+    const statusConfig = {
+        'Pending': { solid: '#EF4444', glow: 'rgba(239, 68, 68, 0.4)', icon: 'fa-triangle-exclamation' },
+        'Adopted': { solid: '#F59E0B', glow: 'rgba(245, 158, 11, 0.4)', icon: 'fa-screwdriver-wrench' },
+        'Pending Verification': { solid: '#3B82F6', glow: 'rgba(59, 130, 246, 0.4)', icon: 'fa-clipboard-check' },
+        'Resolved': { solid: '#10B981', glow: 'rgba(16, 185, 129, 0.4)', icon: 'fa-check' },
+        'Rejected': { solid: '#7A1C1C', glow: 'rgba(122, 28, 28, 0.4)', icon: 'fa-xmark' }
     };
 
-    function createStatusIcon(status) {
-        const color = statusColors[status] || '#2B2B2B';
-        const isAmber = status === 'Adopted';
-        const textColor = isAmber ? '#2B2B2B' : '#FFFFFF';
+    let allMarkers = [];
 
+    function createModernPin(status) {
+        const conf = statusConfig[status] || statusConfig['Pending'];
         return L.divIcon({
-            className: 'custom-leaflet-marker',
-            html: `<div style="
-                background-color: ${color};
-                width: 22px;
-                height: 22px;
-                border-radius: 50%;
-                border: 2px solid #FFFFFF;
-                box-shadow: 0 0 0 1.5px #2B2B2B;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                color: ${textColor};
-                font-size: 10px;
-                font-weight: 700;
-            "><i class="fas fa-location-dot" style="font-size: 10px;"></i></div>`,
-            iconSize: [22, 22],
-            iconAnchor: [11, 11],
-            popupAnchor: [0, -12]
+            className: 'custom-modern-pin',
+            html: `
+                <div class="pulse-marker-wrapper">
+                    <div class="pulse-marker-glow" style="background-color: ${conf.solid};"></div>
+                    <div class="pulse-marker-icon" style="background-color: ${conf.solid};">
+                        <i class="fas ${conf.icon}" style="font-size: 11px;"></i>
+                    </div>
+                </div>
+            `,
+            iconSize: [28, 28],
+            iconAnchor: [14, 14],
+            popupAnchor: [0, -16]
         });
     }
 
-    // Fetch live violations from API
     fetch("{% url 'api_violation_list' %}")
         .then(res => res.json())
-        .then(data => {
-            const markers = [];
-            const tbody = document.getElementById('recent-reports-tbody');
-            if (tbody && data.length > 0) {
-                tbody.innerHTML = '';
-            }
+        .then(violations => {
+            const countEl = document.getElementById('live-incident-count');
+            if (countEl) countEl.innerText = `${violations.length} active incidents tracked`;
 
-            data.forEach((v, index) => {
+            const tbody = document.getElementById('home-incident-tbody');
+            if (tbody && violations.length > 0) tbody.innerHTML = '';
+
+            violations.forEach((v, index) => {
                 if (v.latitude && v.longitude) {
-                    const icon = createStatusIcon(v.status);
-                    const marker = L.marker([v.latitude, v.longitude], { icon: icon }).addTo(map);
-                    
-                    const badgeClass = v.status === 'Pending' ? 'status-badge-pending' :
-                                       v.status === 'Adopted' ? 'status-badge-adopted' :
-                                       v.status === 'Pending Verification' ? 'status-badge-verification' :
-                                       v.status === 'Resolved' ? 'status-badge-resolved' : 'status-badge-rejected';
+                    const icon = createModernPin(v.status);
+                    const marker = L.marker([v.latitude, v.longitude], { icon: icon });
+                    marker.violationData = v;
 
-                    const popupContent = `
-                        <div style="font-family: 'IBM Plex Sans', sans-serif; min-width: 180px;">
-                            <div style="margin-bottom: 4px;">
-                                <span class="status-badge ${badgeClass}" style="font-size: 10px; padding: 2px 6px;">${v.status}</span>
-                                <span class="category-tag" style="font-size: 10px;">${v.category}</span>
+                    const badgeClass = v.status === 'Pending' ? 'badge-status-pending' :
+                                       v.status === 'Adopted' ? 'badge-status-adopted' :
+                                       v.status === 'Pending Verification' ? 'badge-status-verification' :
+                                       v.status === 'Resolved' ? 'badge-status-resolved' : 'badge-status-pending';
+
+                    marker.bindPopup(`
+                        <div style="font-family: 'Plus Jakarta Sans', sans-serif; min-width: 200px; padding: 2px;">
+                            <div style="margin-bottom: 6px;">
+                                <span class="badge-status ${badgeClass}" style="font-size: 10px; padding: 2px 6px;">${v.status}</span>
+                                <span class="badge-category" style="font-size: 10px;">${v.category}</span>
                             </div>
-                            <h4 style="font-size: 13px; font-weight: 700; margin: 4px 0 6px 0; color: #2B2B2B;">${v.title}</h4>
-                            <a href="${v.url}" class="btn-civic btn-civic-primary btn-civic-sm" style="font-size: 11px; padding: 3px 8px; width: 100%; text-align: center; box-sizing: border-box;">View Incident Details</a>
+                            <h4 style="font-size: 14px; font-weight: 700; margin: 4px 0 8px 0; color: #0F172A;">${v.title}</h4>
+                            <a href="${v.url}" class="btn-modern btn-modern-primary btn-modern-sm" style="width: 100%; text-align: center; box-sizing: border-box; display: block;">Inspect Incident</a>
                         </div>
-                    `;
-                    marker.bindPopup(popupContent);
-                    markers.push(marker);
+                    `);
+
+                    marker.addTo(map);
+                    allMarkers.push(marker);
                 }
 
-                // Add to recent feed table
                 if (tbody && index < 6) {
                     const row = document.createElement('tr');
-                    const badgeClass = v.status === 'Pending' ? 'status-badge-pending' :
-                                       v.status === 'Adopted' ? 'status-badge-adopted' :
-                                       v.status === 'Pending Verification' ? 'status-badge-verification' :
-                                       v.status === 'Resolved' ? 'status-badge-resolved' : 'status-badge-rejected';
+                    const badgeClass = v.status === 'Pending' ? 'badge-status-pending' :
+                                       v.status === 'Adopted' ? 'badge-status-adopted' :
+                                       v.status === 'Pending Verification' ? 'badge-status-verification' :
+                                       v.status === 'Resolved' ? 'badge-status-resolved' : 'badge-status-pending';
 
                     row.innerHTML = `
                         <td><strong>${v.title}</strong></td>
-                        <td><span class="category-tag">${v.category}</span></td>
-                        <td><span class="status-badge ${badgeClass}">${v.status}</span></td>
-                        <td><a href="${v.url}" class="btn-civic btn-civic-secondary btn-civic-sm">Inspect</a></td>
+                        <td><span class="badge-category">${v.category}</span></td>
+                        <td><span class="badge-status ${badgeClass}">${v.status}</span></td>
+                        <td style="text-align: right;"><a href="${v.url}" class="btn-modern btn-modern-secondary btn-modern-sm">View</a></td>
                     `;
                     tbody.appendChild(row);
                 }
             });
 
-            if (markers.length > 0) {
-                const group = new L.featureGroup(markers);
-                map.fitBounds(group.getBounds().pad(0.15));
+            if (allMarkers.length > 0) {
+                const group = new L.featureGroup(allMarkers);
+                map.fitBounds(group.getBounds().pad(0.12));
             }
         })
-        .catch(err => console.error("Error loading incident map data:", err));
+        .catch(err => console.error("Error loading map data:", err));
+
+    // Filter Chips Event
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', function() {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+
+            const status = this.getAttribute('data-status');
+            allMarkers.forEach(m => {
+                if (status === 'all' || m.violationData.status === status) {
+                    m.addTo(map);
+                } else {
+                    map.removeLayer(m);
+                }
+            });
+        });
+    });
 });
 </script>
 {% endblock %}

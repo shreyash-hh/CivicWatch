@@ -4,152 +4,161 @@
 {% block title %}CivicWatch :: Incident #{{ v.id }} - {{ v.title }}{% endblock %}
 
 {% block content %}
-<div class="civic-container">
+<div class="main-container">
 
-    <!-- Incident Header Panel -->
-    <div class="civic-panel">
-        <div class="civic-panel-header">
+    <!-- Incident Header Card -->
+    <div class="modern-card mb-4">
+        <div class="modern-card-header">
             <div>
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <span class="category-tag">Incident #{{ v.id }}</span>
-                    <span class="category-tag">{{ v.get_category_display }}</span>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <span class="badge-category">Incident #{{ v.id }}</span>
+                    <span class="badge-category"><i class="fas fa-tag me-1 text-primary"></i>{{ v.get_category_display }}</span>
+                    
                     {% if v.status == 'Pending' %}
-                        <span class="status-badge status-badge-pending"><i class="fas fa-circle-exclamation"></i> Pending Hazard</span>
+                        <span class="badge-status badge-status-pending"><span class="status-indicator-dot dot-pending"></span> Hazard: Pending</span>
                     {% elif v.status == 'Adopted' %}
-                        <span class="status-badge status-badge-adopted"><i class="fas fa-person-digging"></i> In Progress (Adopted)</span>
+                        <span class="badge-status badge-status-adopted"><span class="status-indicator-dot dot-adopted"></span> In Progress (Adopted)</span>
                     {% elif v.status == 'Pending Verification' %}
-                        <span class="status-badge status-badge-verification"><i class="fas fa-clipboard-check"></i> Pending Verification</span>
+                        <span class="badge-status badge-status-verification"><span class="status-indicator-dot dot-verification"></span> Pending Verification</span>
                     {% elif v.status == 'Resolved' %}
-                        <span class="status-badge status-badge-resolved"><i class="fas fa-check-circle"></i> Resolved & Certified</span>
+                        <span class="badge-status badge-status-resolved"><span class="status-indicator-dot dot-resolved"></span> Resolved & Certified</span>
                     {% else %}
-                        <span class="status-badge status-badge-rejected">{{ v.status }}</span>
+                        <span class="badge-status badge-status-pending">{{ v.status }}</span>
                     {% endif %}
                 </div>
-                <h1 style="font-size: var(--font-size-xl); margin: 0.25rem 0 0.5rem 0;">{{ v.title }}</h1>
-                <div class="text-muted" style="font-size: var(--font-size-xs);">
-                    <span><i class="fas fa-location-dot me-1"></i> {{ v.location }}</span>
-                    <span class="mx-2">&bull;</span>
-                    <span>Reported by <strong>{{ v.reported_by.username }}</strong> on {{ v.created_at|date:"M d, Y H:i" }}</span>
+
+                <h1 style="font-size: 1.6rem; margin-bottom: 0.4rem;">{{ v.title }}</h1>
+                
+                <div class="text-muted d-flex align-items-center gap-3 flex-wrap" style="font-size: 0.8125rem;">
+                    <span><i class="fas fa-location-dot text-primary me-1"></i> {{ v.location }}</span>
+                    <span><i class="fas fa-user text-muted me-1"></i> Reported by <strong>{{ v.reported_by.username }}</strong> on {{ v.created_at|date:"M d, Y H:i" }}</span>
                     {% if v.adopted_by %}
-                        <span class="mx-2">&bull;</span>
-                        <span>Assigned to <strong>{{ v.adopted_by.username }}</strong></span>
+                        <span><i class="fas fa-hard-hat text-warning me-1"></i> Assigned Worker: <strong>{{ v.adopted_by.username }}</strong></span>
                     {% endif %}
                 </div>
             </div>
 
             <div class="d-flex align-items-center gap-2">
                 {% if v.status == 'Resolved' and v.certificate %}
-                    <a href="{% url 'violation_certificate' v.id %}" class="btn-civic btn-civic-action">
+                    <a href="{% url 'violation_certificate' v.id %}" class="btn-modern btn-modern-success">
                         <i class="fas fa-award me-1"></i> View Official Certificate
                     </a>
                 {% endif %}
-                <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">
-                    <i class="fas fa-arrow-left me-1"></i> Back to Registry
+                <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary btn-modern-sm">
+                    <i class="fas fa-arrow-left me-1"></i> Back
                 </a>
             </div>
         </div>
 
-        <!-- Workflow Lifecycle Stepper -->
-        <div class="workflow-stepper">
-            <div class="step-item active">
-                <span class="step-circle"><i class="fas fa-check"></i></span>
+        <!-- Modern Step Progression Bar -->
+        <div class="modern-stepper">
+            <div class="stepper-node active">
+                <div class="stepper-badge"><i class="fas fa-check"></i></div>
                 <span>1. Reported</span>
             </div>
-            <div class="step-divider"></div>
-            <div class="step-item {% if v.status == 'Adopted' or v.status == 'Pending Verification' or v.status == 'Resolved' %}active{% endif %}">
-                <span class="step-circle">{% if v.status == 'Adopted' or v.status == 'Pending Verification' or v.status == 'Resolved' %}<i class="fas fa-check"></i>{% else %}2{% endif %}</span>
+            <div class="stepper-line {% if v.status == 'Adopted' or v.status == 'Pending Verification' or v.status == 'Resolved' %}active{% endif %}"></div>
+            <div class="stepper-node {% if v.status == 'Adopted' or v.status == 'Pending Verification' or v.status == 'Resolved' %}active{% endif %}">
+                <div class="stepper-badge">{% if v.status == 'Adopted' or v.status == 'Pending Verification' or v.status == 'Resolved' %}<i class="fas fa-check"></i>{% else %}2{% endif %}</div>
                 <span>2. Adopted</span>
             </div>
-            <div class="step-divider"></div>
-            <div class="step-item {% if v.status == 'Pending Verification' or v.status == 'Resolved' %}active{% endif %}">
-                <span class="step-circle">{% if v.status == 'Resolved' %}<i class="fas fa-check"></i>{% elif v.status == 'Pending Verification' %}3{% else %}3{% endif %}</span>
+            <div class="stepper-line {% if v.status == 'Pending Verification' or v.status == 'Resolved' %}active{% endif %}"></div>
+            <div class="stepper-node {% if v.status == 'Pending Verification' or v.status == 'Resolved' %}active{% endif %}">
+                <div class="stepper-badge">{% if v.status == 'Resolved' %}<i class="fas fa-check"></i>{% elif v.status == 'Pending Verification' %}3{% else %}3{% endif %}</div>
                 <span>3. Proof Submitted</span>
             </div>
-            <div class="step-divider"></div>
-            <div class="step-item {% if v.status == 'Resolved' %}active{% endif %}">
-                <span class="step-circle">{% if v.status == 'Resolved' %}<i class="fas fa-check"></i>{% else %}4{% endif %}</span>
+            <div class="stepper-line {% if v.status == 'Resolved' %}active{% endif %}"></div>
+            <div class="stepper-node {% if v.status == 'Resolved' %}active{% endif %}">
+                <div class="stepper-badge">{% if v.status == 'Resolved' %}<i class="fas fa-check"></i>{% else %}4{% endif %}</div>
                 <span>4. Verified & Resolved</span>
             </div>
         </div>
 
         <!-- Incident Description -->
-        <div style="margin-bottom: 1.5rem;">
-            <h4 style="font-size: var(--font-size-sm); font-weight: 700; text-transform: uppercase; color: var(--color-muted); margin-bottom: 0.4rem;">Incident Details</h4>
-            <p style="font-size: var(--font-size-base); line-height: 1.6; margin: 0;">{{ v.description }}</p>
+        <div style="background-color: #F8FAFC; border: 1px solid var(--border-light); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 1.75rem;">
+            <div class="text-muted" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.35rem;">Technical Description</div>
+            <p style="font-size: 0.9375rem; line-height: 1.6; margin: 0;">{{ v.description }}</p>
         </div>
 
         <!-- ================================================================= -->
-        <!-- CORE TRUST MECHANISM: REAL-SIZE SIDE-BY-SIDE RESOLUTION EVIDENCE -->
+        <!-- CORE TRUST MECHANISM: BEFORE / AFTER RESOLUTION SHOWCASE          -->
         <!-- ================================================================= -->
-        <h3 style="font-size: var(--font-size-md); font-weight: 700; border-bottom: 2px solid var(--color-asphalt); padding-bottom: 0.5rem; margin-top: 1.5rem;">
-            <i class="fas fa-images me-1"></i> Resolution Evidence & Proof of Work
-        </h3>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <h3 class="card-title-main" style="font-size: 1.15rem;">
+                <i class="fas fa-images text-primary"></i> Resolution Verification & Proof Showcase
+            </h3>
+            <span class="badge-category"><i class="fas fa-shield-halved text-success me-1"></i> Audited Evidence</span>
+        </div>
 
-        <div class="proof-comparison-grid">
+        <div class="showcase-grid">
             
-            <!-- BEFORE / INITIAL REPORT EVIDENCE -->
-            <div class="proof-card proof-card-before">
-                <div class="proof-header">
-                    <span class="proof-title"><i class="fas fa-triangle-exclamation text-danger me-1"></i> Before Resolution (Initial Defect)</span>
-                    <span class="status-badge status-badge-pending">Initial Evidence</span>
+            <!-- BEFORE CARD -->
+            <div class="showcase-card showcase-card-before">
+                <div class="showcase-card-header">
+                    <span class="showcase-card-title"><i class="fas fa-triangle-exclamation text-danger"></i> Before Resolution</span>
+                    <span class="badge-status badge-status-pending">Initial Defect</span>
                 </div>
-                <div class="proof-image-frame">
+                <div class="showcase-media-frame">
                     {% if v.submission and v.submission.before_photo %}
-                        <img src="{{ v.submission.before_photo.url }}" alt="Before resolution evidence" class="proof-image">
+                        <img src="{{ v.submission.before_photo.url }}" alt="Before resolution photo" class="showcase-img">
                     {% elif v.image %}
-                        <img src="{{ v.image.url }}" alt="Initial report image" class="proof-image">
+                        <img src="{{ v.image.url }}" alt="Initial report image" class="showcase-img">
                     {% else %}
-                        <div class="text-muted text-center p-4">No initial photograph provided during report submission.</div>
+                        <div class="text-center p-4" style="color: #64748B;">
+                            <i class="fas fa-camera-slash fa-3x mb-2" style="display:block;"></i>
+                            No initial photograph provided
+                        </div>
                     {% endif %}
                 </div>
-                <div class="proof-meta">
+                <div class="showcase-card-footer">
                     <div><strong>Reported:</strong> {{ v.created_at|date:"M d, Y H:i" }} by {{ v.reported_by.username }}</div>
-                    <div><strong>GPS Coordinates:</strong> {{ v.latitude|default:"N/A" }}, {{ v.longitude|default:"N/A" }}</div>
+                    <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">
+                        <i class="fas fa-map-pin me-1"></i> GPS: {{ v.latitude|default:"N/A" }}, {{ v.longitude|default:"N/A" }}
+                    </div>
                 </div>
             </div>
 
-            <!-- AFTER / RESOLUTION PROOF EVIDENCE -->
-            <div class="proof-card proof-card-after">
-                <div class="proof-header">
-                    <span class="proof-title"><i class="fas fa-check-circle text-success me-1"></i> After Resolution (Completed Proof)</span>
+            <!-- AFTER CARD -->
+            <div class="showcase-card showcase-card-after">
+                <div class="showcase-card-header">
+                    <span class="showcase-card-title"><i class="fas fa-check-circle text-success"></i> After Remediation Proof</span>
                     {% if v.status == 'Resolved' %}
-                        <span class="status-badge status-badge-resolved">Verified Resolved</span>
+                        <span class="badge-status badge-status-resolved"><i class="fas fa-check"></i> Verified Work</span>
                     {% elif v.status == 'Pending Verification' %}
-                        <span class="status-badge status-badge-verification">Pending Audit</span>
+                        <span class="badge-status badge-status-verification">In Review</span>
                     {% else %}
-                        <span class="status-badge status-badge-adopted">Awaiting Work</span>
+                        <span class="badge-status badge-status-adopted">In Progress</span>
                     {% endif %}
                 </div>
                 
-                <div class="proof-image-frame">
+                <div class="showcase-media-frame">
                     {% if v.submission and v.submission.after_photos.exists %}
                         {% for img in v.submission.after_photos.all %}
-                            <img src="{{ img.image.url }}" alt="After resolution evidence photo {{ forloop.counter }}" class="proof-image" style="{% if not forloop.first %}display:none;{% endif %}" id="after-photo-{{ forloop.counter }}">
+                            <img src="{{ img.image.url }}" alt="After proof {{ forloop.counter }}" class="showcase-img" style="{% if not forloop.first %}display:none;{% endif %}" id="after-photo-view-{{ forloop.counter }}">
                         {% endfor %}
                     {% else %}
-                        <div class="text-center p-4" style="color: #9E9E9E;">
+                        <div class="text-center p-4" style="color: #94A3B8;">
                             <i class="fas fa-screwdriver-wrench fa-3x mb-3" style="display:block;"></i>
-                            <strong>No resolution proof uploaded yet.</strong>
-                            <p style="font-size: var(--font-size-xs); margin: 0.5rem 0 0 0;">The assigned worker will upload completed before/after photos upon physical remediation.</p>
+                            <strong>Remediation In Progress</strong>
+                            <p style="font-size: 0.8125rem; margin: 0.35rem 0 0 0;">Physical proof of work will be uploaded upon defect resolution.</p>
                         </div>
                     {% endif %}
                 </div>
 
-                <div class="proof-meta">
+                <div class="showcase-card-footer">
                     {% if v.submission %}
                         <div><strong>Remediated by:</strong> {{ v.submission.worker.username }} on {{ v.submission.submitted_at|date:"M d, Y H:i" }}</div>
-                        <div style="margin-top: 0.35rem;"><strong>Work Log Summary:</strong> {{ v.submission.work_description }}</div>
+                        <div style="margin-top: 0.35rem; color: #334155;"><strong>Work Summary:</strong> {{ v.submission.work_description }}</div>
                         {% if v.submission.after_photos.count > 1 %}
                             <div class="d-flex gap-1 mt-2">
                                 {% for img in v.submission.after_photos.all %}
-                                    <button type="button" class="btn-civic btn-civic-secondary btn-civic-sm" onclick="document.querySelectorAll('.proof-card-after .proof-image').forEach(el => el.style.display='none'); document.getElementById('after-photo-{{ forloop.counter }}').style.display='block';" style="font-size: 10px; padding: 2px 6px;">
+                                    <button type="button" class="btn-modern btn-modern-secondary btn-modern-sm" onclick="document.querySelectorAll('.showcase-card-after .showcase-img').forEach(el => el.style.display='none'); document.getElementById('after-photo-view-{{ forloop.counter }}').style.display='block';" style="font-size: 11px; padding: 2px 7px;">
                                         Photo {{ forloop.counter }}
                                     </button>
                                 {% endfor %}
                             </div>
                         {% endif %}
                     {% else %}
-                        <div>Status: Pending assignment or active on-site work.</div>
+                        <div class="text-muted">Awaiting physical resolution by assigned volunteer/NGO.</div>
                     {% endif %}
                 </div>
             </div>
@@ -157,142 +166,150 @@
         </div>
 
         <!-- ================================================================= -->
-        <!-- ACTION PANELS & ROLE-GATED UTILITY CONTROLS                      -->
+        <!-- ROLE-GATED ACTION PANELS                                         -->
         <!-- ================================================================= -->
 
         <!-- Help Request Dispatch (Reporter Only) -->
         {% if request.user == v.reported_by and not v.is_help_requested and v.status == 'Pending' %}
-            <div class="civic-alert civic-alert-info d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="modern-alert modern-alert-info d-flex align-items-center justify-content-between flex-wrap gap-2 mt-4">
                 <div>
                     <strong><i class="fas fa-bullhorn me-1"></i> Request Volunteer / NGO Dispatch</strong>
-                    <div style="font-size: var(--font-size-xs);">Broadcast an immediate help request to verified volunteers and organizations within a 10km radius.</div>
+                    <div style="font-size: 0.8125rem;">Broadcast an instant alert to verified volunteers and organizations within a 10km radius.</div>
                 </div>
-                <a href="{% url 'request_help' v.id %}" class="btn-civic btn-civic-primary btn-civic-sm">Dispatch Proximity Request</a>
+                <a href="{% url 'request_help' v.id %}" class="btn-modern btn-modern-primary btn-modern-sm">
+                    Dispatch Proximity Alert
+                </a>
             </div>
         {% elif v.is_help_requested and v.status == 'Pending' %}
-            <div class="civic-alert civic-alert-warning">
-                <i class="fas fa-check-double"></i>
-                <div>Help request active: Verified nearby civic workers and NGOs have been alerted to inspect and adopt this issue.</div>
+            <div class="modern-alert modern-alert-warning mt-4">
+                <i class="fas fa-check-double fa-lg"></i>
+                <div>Help request active: Verified nearby civic workers and NGOs have been notified.</div>
             </div>
         {% endif %}
 
         <!-- Adopt Incident Action -->
         {% if can_adopt %}
-            <div class="civic-panel" style="background-color: var(--color-concrete); border-left: 4px solid var(--color-adopted); margin-top: 1rem;">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="modern-card mt-4" style="background: linear-gradient(135deg, #FFFBEB, #FEF3C7); border-color: #FDE68A;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
-                        <h4 style="margin: 0; font-size: var(--font-size-sm); font-weight: 700;">Adopt Incident for Remediation</h4>
-                        <p class="text-muted" style="margin: 0; font-size: var(--font-size-xs);">As a verified civic worker, you can assign this issue to yourself, perform resolution work, and submit proof.</p>
+                        <h4 style="margin: 0; color: #92400E;"><i class="fas fa-hand-holding-hand me-1"></i> Adopt this Incident for Remediation</h4>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: #78350F;">As a verified community worker, you can adopt this defect, perform repair work, and submit proof for civic credits.</p>
                     </div>
-                    <a href="{% url 'adopt_violation' v.id %}" class="btn-civic btn-civic-primary">
-                        <i class="fas fa-hand-holding-hand me-1"></i> Adopt Issue Now
+                    <a href="{% url 'adopt_violation' v.id %}" class="btn-modern btn-modern-primary">
+                        Adopt Issue Now
                     </a>
                 </div>
             </div>
         {% endif %}
 
-        <!-- Submit Proof Action (Assigned Worker) -->
+        <!-- Submit Proof Action -->
         {% if can_submit_proof %}
-            <div class="civic-panel" style="background-color: var(--color-concrete); border-left: 4px solid var(--color-verification); margin-top: 1rem;">
-                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div class="modern-card mt-4" style="background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border-color: #BFDBFE;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                     <div>
-                        <h4 style="margin: 0; font-size: var(--font-size-sm); font-weight: 700;">Submit Remediation Proof & Photographs</h4>
-                        <p class="text-muted" style="margin: 0; font-size: var(--font-size-xs);">Upload after-photos and a work summary for independent verification and civic credit issuance.</p>
+                        <h4 style="margin: 0; color: #1E40AF;"><i class="fas fa-upload me-1"></i> Submit Completed Work Proof</h4>
+                        <p style="margin: 0.25rem 0 0 0; font-size: 0.8125rem; color: #1E3A8A;">Upload resolution photographs and description for independent audit verification.</p>
                     </div>
-                    <a href="{% url 'submit_work_proof' v.id %}" class="btn-civic btn-civic-primary">
-                        <i class="fas fa-upload me-1"></i> Submit Work Proof
+                    <a href="{% url 'submit_work_proof' v.id %}" class="btn-modern btn-modern-primary">
+                        Submit Work Proof
                     </a>
                 </div>
             </div>
         {% endif %}
 
-        <!-- Verification Action (Reporter / Admin) -->
+        <!-- Verification Action -->
         {% if can_verify %}
-            <div class="civic-panel" style="background-color: #FAF6ED; border: 2px solid var(--color-adopted); margin-top: 1rem;">
-                <h4 style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: 0.5rem;"><i class="fas fa-stamp me-1"></i> Official Resolution Audit</h4>
-                <p style="font-size: var(--font-size-sm); margin-bottom: 1rem;">Review the before and after evidence above. If the defect has been properly remediated, approve the resolution to award civic credits and generate the official verification certificate.</p>
+            <div class="modern-card mt-4" style="background: linear-gradient(135deg, #ECFDF5, #D1FAE5); border: 2px solid #A7F3D0;">
+                <h4 style="color: #065F46; font-size: 1.15rem; margin-bottom: 0.4rem;"><i class="fas fa-stamp me-1"></i> Official Resolution Audit</h4>
+                <p style="font-size: 0.875rem; color: #064E3B; margin-bottom: 1rem;">Review the before/after photographs above. If the defect has been properly remediated, approve to award civic credits and issue the official certificate.</p>
                 <div class="d-flex gap-2">
-                    <a href="{% url 'verify_resolution' v.id %}?action=approve" class="btn-civic btn-civic-action btn-civic-lg">
+                    <a href="{% url 'verify_resolution' v.id %}?action=approve" class="btn-modern btn-modern-success btn-modern-lg">
                         <i class="fas fa-check-circle me-1"></i> Approve & Certify Resolution
                     </a>
-                    <a href="{% url 'verify_resolution' v.id %}?action=reject" class="btn-civic btn-civic-secondary btn-civic-lg" style="color: var(--color-pending); border-color: var(--color-pending);">
-                        <i class="fas fa-rotate-left me-1"></i> Reject Proof for Rework
+                    <a href="{% url 'verify_resolution' v.id %}?action=reject" class="btn-modern btn-modern-secondary btn-modern-lg" style="color: #DC2626; border-color: #FECACA;">
+                        <i class="fas fa-rotate-left me-1"></i> Request Rework
                     </a>
                 </div>
             </div>
         {% endif %}
 
-        <!-- Community Rating Form (Resolved) -->
+        <!-- Community Rating -->
         {% if v.status == 'Resolved' and v.submission and user.is_authenticated and user != v.submission.worker %}
-            <div class="civic-panel" style="margin-top: 1rem; background-color: var(--color-concrete);">
+            <div class="modern-card mt-4" style="background-color: #F8FAFC;">
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
-                    <h4 style="font-size: var(--font-size-sm); font-weight: 700; margin: 0;">Community Quality Rating</h4>
+                    <h4 style="font-size: 0.95rem; margin: 0;"><i class="fas fa-star text-warning me-1"></i> Community Quality Rating</h4>
                     {% if v.submission.rating_count > 0 %}
-                        <span class="category-tag"><strong>{{ v.submission.avg_rating|floatformat:1 }} / 5.0</strong> ({{ v.submission.rating_count }} reviews)</span>
+                        <span class="badge-category"><strong>{{ v.submission.avg_rating|floatformat:1 }} / 5.0</strong> ({{ v.submission.rating_count }} reviews)</span>
                     {% endif %}
                 </div>
                 <form action="{% url 'rate_work' v.submission.id %}" method="POST" class="d-flex align-items-center gap-2 flex-wrap">
                     {% csrf_token %}
-                    <label for="stars-select" class="civic-label" style="margin: 0;">Rating:</label>
-                    <select name="stars" id="stars-select" class="civic-select" style="width: auto;" required>
-                        <option value="5">5 - Excellent Quality</option>
-                        <option value="4">4 - Good</option>
-                        <option value="3">3 - Satisfactory</option>
-                        <option value="2">2 - Substandard</option>
-                        <option value="1">1 - Inadequate</option>
+                    <select name="stars" class="modern-select" style="width: auto;" required>
+                        <option value="5">5 ★ - Excellent Quality</option>
+                        <option value="4">4 ★ - Good</option>
+                        <option value="3">3 ★ - Satisfactory</option>
+                        <option value="2">2 ★ - Substandard</option>
+                        <option value="1">1 ★ - Inadequate</option>
                     </select>
-                    <input type="text" name="review" class="civic-input" placeholder="Optional audit review note" style="flex-grow: 1; min-width: 200px;">
-                    <button type="submit" class="btn-civic btn-civic-primary btn-civic-sm">Submit Review</button>
+                    <input type="text" name="review" class="modern-input" placeholder="Optional audit review note" style="flex-grow: 1; min-width: 220px;">
+                    <button type="submit" class="btn-modern btn-modern-primary btn-modern-sm">Submit Rating</button>
                 </form>
             </div>
         {% endif %}
 
     </div>
 
-    <!-- Community Audit Log & Comment Thread -->
-    <div class="civic-panel">
-        <div class="civic-panel-header">
-            <h3 class="civic-panel-title"><i class="fas fa-comments"></i> Public Incident Log & Comments</h3>
-            <span class="category-tag">{{ comments.count }} entries</span>
+    <!-- Community Activity & Comments -->
+    <div class="modern-card">
+        <div class="modern-card-header">
+            <h3 class="card-title-main"><i class="fas fa-comments text-primary"></i> Public Activity & Updates</h3>
+            <span class="badge-category">{{ comments.count }} entries</span>
         </div>
 
         {% if user.is_authenticated %}
             <form method="POST" style="margin-bottom: 1.5rem;">
                 {% csrf_token %}
-                <div class="civic-form-group">
-                    <label for="comment-text" class="civic-label">Add Official Update or Community Note:</label>
-                    <textarea name="text" id="comment-text" class="civic-textarea" rows="3" placeholder="Enter status update, contractor note, or citizen clarification..." required></textarea>
+                <div class="modern-form-group">
+                    <label for="comment-text" class="modern-label">Add Community Note or Update:</label>
+                    <textarea name="text" id="comment-text" class="modern-textarea" rows="3" placeholder="Enter status update, contractor note, or community comment..." required></textarea>
                 </div>
-                <button type="submit" class="btn-civic btn-civic-primary btn-civic-sm">Post Update to Public Log</button>
+                <button type="submit" class="btn-modern btn-modern-primary btn-modern-sm">Post Update</button>
             </form>
         {% else %}
-            <div class="civic-alert civic-alert-info">
-                Please <a href="{% url 'login' %}">Log in</a> to contribute comments or status updates.
+            <div class="modern-alert modern-alert-info">
+                Please <a href="{% url 'login' %}" style="font-weight: 700; color: inherit;">Log In</a> to contribute notes or updates.
             </div>
         {% endif %}
 
-        <div class="civic-table-container">
-            <table class="civic-table">
+        <div class="modern-table-container">
+            <table class="modern-table">
                 <thead>
                     <tr>
-                        <th style="width: 25%;">Author & Role</th>
-                        <th style="width: 55%;">Note / Update</th>
-                        <th style="width: 20%;">Timestamp</th>
+                        <th style="width: 25%;">Author</th>
+                        <th style="width: 55%;">Note</th>
+                        <th style="width: 20%;">Time</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for comment in comments %}
                         <tr>
                             <td>
-                                <strong>{{ comment.user.username }}</strong>
-                                <div style="font-size: var(--font-size-xs); color: var(--color-muted);">{{ comment.user.get_role_display }}</div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="user-avatar-initials" style="width: 24px; height: 24px; font-size: 10px;">
+                                        {{ comment.user.username|make_list|first|upper }}
+                                    </div>
+                                    <div>
+                                        <strong>{{ comment.user.username }}</strong>
+                                        <div style="font-size: 0.75rem; color: var(--text-muted);">{{ comment.user.get_role_display }}</div>
+                                    </div>
+                                </div>
                             </td>
                             <td>{{ comment.text }}</td>
-                            <td style="font-size: var(--font-size-xs); color: var(--color-muted);">{{ comment.created_at|date:"M d, Y H:i" }}</td>
+                            <td style="font-size: 0.8125rem; color: var(--text-muted);">{{ comment.created_at|date:"M d, Y H:i" }}</td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="3" class="text-center text-muted py-3">No public log entries recorded for this incident yet.</td>
+                            <td colspan="3" class="text-center text-muted py-4">No community updates recorded yet.</td>
                         </tr>
                     {% endfor %}
                 </tbody>

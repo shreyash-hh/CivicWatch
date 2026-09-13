@@ -4,56 +4,50 @@
 {% block title %}CivicWatch :: Certificate Verification {{ cert.verification_id }}{% endblock %}
 
 {% block content %}
-<div class="civic-container-narrow">
-    <div class="civic-panel text-center" style="padding: 2rem 1.5rem; margin-top: 1rem;">
+<div class="main-container-narrow text-center">
+    <div class="modern-card" style="padding: 2.5rem 1.5rem; margin-top: 1rem;">
         <i class="fas fa-certificate fa-4x text-success mb-3" style="display: block;"></i>
-        <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.5rem 0;">Public Certificate Verification Seal</h1>
-        <p class="text-muted" style="font-size: var(--font-size-sm); max-width: 540px; margin: 0 auto 1.5rem auto;">
-            This official public record confirms the resolution and verification status of municipal incident report <strong>#{{ v.id }}</strong>.
+        <h1 style="font-size: 1.75rem; margin-bottom: 0.35rem;">Official Certificate Verification Seal</h1>
+        <p class="text-muted" style="font-size: 0.875rem; max-width: 520px; margin: 0 auto 1.5rem auto;">
+            This verified public ledger record confirms the resolution and credit issuance for Incident <strong>#{{ v.id }}: {{ v.title }}</strong>.
         </p>
 
-        <div class="civic-panel text-start" style="background-color: var(--color-concrete); border: 2px solid var(--color-asphalt); margin: 0 auto 1.5rem auto; max-width: 600px;">
-            <div class="civic-table-container" style="border: none;">
-                <table class="civic-table">
-                    <tbody>
-                        <tr>
-                            <td style="font-weight: 700; width: 35%;">Certificate UUID:</td>
-                            <td><code>{{ cert.verification_id }}</code></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Incident Title:</td>
-                            <td><strong>{{ v.title }}</strong></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Category:</td>
-                            <td><span class="category-tag">{{ v.get_category_display }}</span></td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Reporting Citizen:</td>
-                            <td>{{ cert.issued_to_reporter.username }} (+{{ cert.points_awarded_reporter }} pts)</td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Remediation Worker:</td>
-                            <td>{{ cert.issued_to_worker.username }} (+{{ cert.points_awarded_worker }} pts)</td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Audit Issuance Date:</td>
-                            <td>{{ cert.issued_at|date:"F d, Y H:i" }}</td>
-                        </tr>
-                        <tr>
-                            <td style="font-weight: 700;">Status:</td>
-                            <td><span class="status-badge status-badge-resolved">Verified Authentic</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="modern-table-container text-start mb-4" style="max-width: 580px; margin: 0 auto 1.5rem auto;">
+            <table class="modern-table">
+                <tbody>
+                    <tr>
+                        <td style="font-weight: 700; width: 35%; background-color: #F8FAFC;">Certificate UUID:</td>
+                        <td><code>{{ cert.verification_id }}</code></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Incident Title:</td>
+                        <td><strong>{{ v.title }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Category:</td>
+                        <td><span class="badge-category">{{ v.get_category_display }}</span></td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Reporting Citizen:</td>
+                        <td>{{ cert.issued_to_reporter.username }} (+{{ cert.points_awarded_reporter }} pts)</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Remediation Worker:</td>
+                        <td>{{ cert.issued_to_worker.username }} (+{{ cert.points_awarded_worker }} pts)</td>
+                    </tr>
+                    <tr>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Audit Status:</td>
+                        <td><span class="badge-status badge-status-resolved"><i class="fas fa-check-circle"></i> Authenticated</span></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="d-flex justify-content-center gap-2">
-            <a href="{% url 'violation_detail' v.id %}" class="btn-civic btn-civic-primary">
+            <a href="{% url 'violation_detail' v.id %}" class="btn-modern btn-modern-primary">
                 <i class="fas fa-arrow-up-right-from-square me-1"></i> View Full Incident Record
             </a>
-            <a href="{% url 'violation_certificate' v.id %}" class="btn-civic btn-civic-secondary">
+            <a href="{% url 'violation_certificate' v.id %}" class="btn-modern btn-modern-secondary">
                 <i class="fas fa-file-pdf me-1"></i> Printable Certificate
             </a>
         </div>

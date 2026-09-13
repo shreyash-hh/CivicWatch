@@ -1,106 +1,97 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}CivicWatch :: Official Resolution Certificate {{ cert.verification_id }}{% endblock %}
+{% block title %}CivicWatch :: Verified Resolution Certificate {{ cert.verification_id }}{% endblock %}
 
 {% block content %}
-<div class="civic-container-narrow">
+<div class="main-container-narrow">
 
-    <!-- Action Toolbar (Hidden in print) -->
-    <div class="d-flex justify-content-between align-items-center mb-4" style="margin-top: 1rem;">
-        <a href="{% url 'violation_detail' v.id %}" class="btn-civic btn-civic-secondary btn-civic-sm">
-            <i class="fas fa-arrow-left me-1"></i> Return to Incident Record
+    <!-- Action Bar (Hidden in print) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <a href="{% url 'violation_detail' v.id %}" class="btn-modern btn-modern-secondary btn-modern-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Incident
         </a>
         <div class="d-flex gap-2">
-            <button onclick="window.print()" class="btn-civic btn-civic-primary btn-civic-sm">
-                <i class="fas fa-print me-1"></i> Print / Save Official PDF
+            <button onclick="window.print()" class="btn-modern btn-modern-primary btn-modern-sm">
+                <i class="fas fa-print me-1"></i> Print / Save PDF
             </button>
-            <a href="{% url 'verify_certificate' cert.verification_id %}" class="btn-civic btn-civic-secondary btn-civic-sm">
-                <i class="fas fa-shield-check me-1"></i> Public Verification Link
+            <a href="{% url 'verify_certificate' cert.verification_id %}" class="btn-modern btn-modern-secondary btn-modern-sm">
+                <i class="fas fa-shield-check me-1"></i> Public Verification Seal
             </a>
         </div>
     </div>
 
-    <!-- Official Certificate Document -->
-    <div class="cert-document">
-        <div class="cert-watermark"><i class="fas fa-shield-halved"></i></div>
-
+    <!-- Modern Certificate Container -->
+    <div class="modern-card text-center" style="padding: 3rem 2rem; border: 2px solid var(--status-resolved-border); background: linear-gradient(180deg, #FFFFFF, #F8FAFC); box-shadow: var(--shadow-xl); position: relative;">
+        
         <!-- Header -->
-        <div style="border-bottom: 2px solid var(--color-asphalt); padding-bottom: 1.5rem; margin-bottom: 2rem; text-align: center;">
-            <div style="font-size: var(--font-size-xs); font-weight: 700; letter-spacing: 0.1em; color: var(--color-muted); text-transform: uppercase;">
-                Municipal Civic Resolution & Community Impact Registry
-            </div>
-            <h1 style="font-size: 2rem; font-weight: 700; margin: 0.5rem 0 0.25rem 0; letter-spacing: -0.02em;">
-                OFFICIAL RESOLUTION CERTIFICATE
-            </h1>
-            <div style="font-size: var(--font-size-xs); color: var(--color-muted);">
-                Verification Registry ID: <code style="font-weight: 700; color: var(--color-asphalt);">{{ cert.verification_id }}</code>
+        <div style="border-bottom: 1px solid var(--border-light); padding-bottom: 1.5rem; margin-bottom: 2rem;">
+            <div class="badge-category mb-2"><i class="fas fa-shield-halved text-success me-1"></i> Verified Resolution Certificate</div>
+            <h1 style="font-size: 1.85rem; font-weight: 800; margin-bottom: 0.35rem; color: #0F172A;">CIVIC IMPACT RECOGNITION</h1>
+            <div class="text-muted" style="font-size: 0.8125rem;">
+                Verification Registry UUID: <code style="color: var(--color-accent); font-weight: 700;">{{ cert.verification_id }}</code>
             </div>
         </div>
 
-        <!-- Body -->
-        <div style="margin-bottom: 2rem; text-align: center;">
-            <p style="font-size: var(--font-size-base); line-height: 1.6; max-width: 620px; margin: 0 auto 1.5rem auto;">
-                This public document certifies the successful reporting, physical remediation, and independent community audit of municipal defect <strong>Incident #{{ v.id }}</strong>.
-            </p>
-        </div>
+        <!-- Statement -->
+        <p style="font-size: 1rem; line-height: 1.6; max-width: 620px; margin: 0 auto 2rem auto; color: var(--text-secondary);">
+            This certifies the successful reporting, physical remediation, and community verification of public infrastructure defect <strong>Incident #{{ v.id }}: {{ v.title }}</strong>.
+        </p>
 
-        <!-- Dual Recognition Grid -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+        <!-- Dual Recognition Podium -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; text-align: center;">
             
             <!-- Reporter -->
-            <div class="civic-panel" style="background-color: var(--color-concrete); border: 2px solid var(--color-asphalt); margin: 0; text-align: center; padding: 1.5rem 1rem;">
-                <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--color-muted); text-transform: uppercase;">1. Reporting Citizen</div>
-                <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0.5rem 0 0.25rem 0;">{{ cert.issued_to_reporter.username }}</h3>
-                <span class="status-badge status-badge-resolved">+{{ cert.points_awarded_reporter }} Civic Credits</span>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0.5rem 0 0 0;">Identified and documented defect with GPS location and photographic evidence.</p>
+            <div class="modern-card" style="margin: 0; background: linear-gradient(135deg, #EFF6FF, #DBEAFE); border-color: #BFDBFE;">
+                <div class="text-muted" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">1. Reporting Citizen</div>
+                <h3 style="font-size: 1.25rem; margin: 0.4rem 0 0.25rem 0;">{{ cert.issued_to_reporter.username }}</h3>
+                <span class="badge-status badge-status-verification">+{{ cert.points_awarded_reporter }} Civic Credits</span>
+                <p class="text-muted" style="font-size: 0.75rem; margin: 0.5rem 0 0 0;">Identified defect with geo-tagged photographic evidence.</p>
             </div>
 
-            <!-- Remediation Worker -->
-            <div class="civic-panel" style="background-color: var(--color-concrete); border: 2px solid var(--color-resolved); margin: 0; text-align: center; padding: 1.5rem 1rem;">
-                <div style="font-size: var(--font-size-xs); font-weight: 700; color: var(--color-resolved); text-transform: uppercase;">2. Remediation Worker / NGO</div>
-                <h3 style="font-size: 1.25rem; font-weight: 700; margin: 0.5rem 0 0.25rem 0;">{{ cert.issued_to_worker.username|default:"Unassigned" }}</h3>
-                <span class="status-badge status-badge-resolved">+{{ cert.points_awarded_worker }} Civic Credits</span>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0.5rem 0 0 0;">Executed physical rectification and provided verified resolution proof.</p>
+            <!-- Worker -->
+            <div class="modern-card" style="margin: 0; background: linear-gradient(135deg, #ECFDF5, #D1FAE5); border-color: #A7F3D0;">
+                <div style="color: var(--status-resolved-text); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">2. Remediation Worker / NGO</div>
+                <h3 style="font-size: 1.25rem; margin: 0.4rem 0 0.25rem 0;">{{ cert.issued_to_worker.username|default:"Unassigned" }}</h3>
+                <span class="badge-status badge-status-resolved">+{{ cert.points_awarded_worker }} Civic Credits</span>
+                <p class="text-muted" style="font-size: 0.75rem; margin: 0.5rem 0 0 0;">Executed on-site remediation with verified before/after proof.</p>
             </div>
 
         </div>
 
-        <!-- Incident Metadata Table -->
-        <div class="civic-table-container" style="margin-bottom: 2rem;">
-            <table class="civic-table">
+        <!-- Incident Metadata -->
+        <div class="modern-table-container text-start mb-4">
+            <table class="modern-table">
                 <tbody>
                     <tr>
-                        <td style="width: 30%; font-weight: 700; background-color: var(--color-concrete);">Incident Title:</td>
+                        <td style="width: 30%; font-weight: 700; background-color: #F8FAFC;">Incident Title:</td>
                         <td>{{ v.title }}</td>
                     </tr>
                     <tr>
-                        <td style="font-weight: 700; background-color: var(--color-concrete);">Category:</td>
-                        <td><span class="category-tag">{{ v.get_category_display }}</span></td>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Category:</td>
+                        <td><span class="badge-category">{{ v.get_category_display }}</span></td>
                     </tr>
                     <tr>
-                        <td style="font-weight: 700; background-color: var(--color-concrete);">Physical Location:</td>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Location:</td>
                         <td>{{ v.location }} (GPS: {{ v.latitude }}, {{ v.longitude }})</td>
                     </tr>
                     <tr>
-                        <td style="font-weight: 700; background-color: var(--color-concrete);">Issuance Date:</td>
+                        <td style="font-weight: 700; background-color: #F8FAFC;">Certified Date:</td>
                         <td>{{ cert.issued_at|date:"F d, Y H:i" }}</td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Signatures & Authority -->
-        <div style="border-top: 2px solid var(--color-asphalt); padding-top: 1.5rem; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-            <div>
-                <div style="font-size: var(--font-size-xs); font-weight: 700;">CivicWatch Automated Audit Verification</div>
-                <div style="font-size: 11px; color: var(--color-muted);">Digitally stamped under protocol CW-SEC-2026</div>
+        <!-- Stamp -->
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 pt-3" style="border-top: 1px solid var(--border-light);">
+            <div class="text-start">
+                <div style="font-size: 0.8125rem; font-weight: 700;">CivicWatch Automated Audit Protocol</div>
+                <div class="text-muted" style="font-size: 0.75rem;">Cryptographically verified on immutable database ledger</div>
             </div>
-            <div style="text-align: right;">
-                <span class="status-badge status-badge-resolved" style="padding: 0.4rem 0.85rem; font-size: 13px;">
-                    <i class="fas fa-stamp me-1"></i> VERIFIED & AUDITED
-                </span>
-            </div>
+            <span class="badge-status badge-status-resolved" style="padding: 0.45rem 1rem; font-size: 0.875rem;">
+                <i class="fas fa-stamp me-1"></i> VERIFIED RESOLUTION
+            </span>
         </div>
 
     </div>

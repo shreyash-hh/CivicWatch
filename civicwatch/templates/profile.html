@@ -4,37 +4,42 @@
 {% block title %}CivicWatch :: Account Profile - {{ request.user.username }}{% endblock %}
 
 {% block content %}
-<div class="civic-container">
+<div class="main-container">
 
-    <!-- Profile Header -->
-    <div class="civic-panel" style="padding: 1.25rem; margin-bottom: 1.5rem;">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div>
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <h1 style="font-size: var(--font-size-xl); margin: 0;">{{ request.user.username }}</h1>
-                    <span class="category-tag">{{ request.user.get_role_display|default:"Citizen" }}</span>
-                    {% if request.user.is_verified %}
-                        <span class="status-badge status-badge-resolved"><i class="fas fa-check-circle"></i> Verified Account</span>
-                    {% elif request.user.role != 'citizen' and not request.user.is_superuser %}
-                        <span class="status-badge status-badge-adopted"><i class="fas fa-clock"></i> Verification Pending</span>
-                    {% endif %}
+    <!-- Profile Header Card -->
+    <div class="modern-card mb-4" style="padding: 1.75rem;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="user-avatar" style="width: 56px; height: 56px; font-size: 1.25rem;">
+                    {{ request.user.username|slice:":2"|upper }}
                 </div>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">
-                    Member since {{ request.user.date_joined|date:"F Y" }} &bull; Account Role: {{ request.user.get_role_display }}
-                </p>
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <h1 style="font-size: 1.5rem; margin: 0;">{{ request.user.username }}</h1>
+                        <span class="badge-category">{{ request.user.get_role_display|default:"Citizen" }}</span>
+                        {% if request.user.is_verified %}
+                            <span class="status-pill status-pill-resolved"><i class="fas fa-check-circle me-1"></i> Verified Account</span>
+                        {% elif request.user.role != 'citizen' and not request.user.is_superuser %}
+                            <span class="status-pill status-pill-adopted"><i class="fas fa-clock me-1"></i> Verification Pending</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted" style="font-size: 0.8125rem; margin: 0;">
+                        Member since {{ request.user.date_joined|date:"F Y" }} &bull; Role: <strong>{{ request.user.get_role_display }}</strong>
+                    </p>
+                </div>
             </div>
             <div>
-                <span class="status-badge status-badge-resolved" style="font-size: var(--font-size-sm); padding: 0.4rem 0.85rem;">
-                    {{ civic_score }} Total Civic Credits
-                </span>
+                <div class="points-pill" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                    <i class="fas fa-award text-amber me-1"></i> {{ civic_score }} Total Civic Credits
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Verification Pending Warning for Workers -->
     {% if request.user.role != 'citizen' and not request.user.is_verified and not request.user.is_superuser %}
-        <div class="civic-alert civic-alert-warning mb-4">
-            <i class="fas fa-id-card fa-lg"></i>
+        <div class="modern-alert modern-alert-warning mb-4">
+            <i class="fas fa-id-card fa-lg mt-1"></i>
             <div>
                 <strong>Worker Verification Required:</strong>
                 <div>Your account as a <strong>{{ request.user.get_role_display }}</strong> is under administrative review. Once verified, you will be authorized to adopt incidents on the live map and earn civic credits.</div>
@@ -43,65 +48,78 @@
     {% endif %}
 
     <!-- Impact Metrics -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
-        <div class="civic-panel" style="margin: 0; border-left: 4px solid var(--color-asphalt);">
-            <div class="text-muted" style="font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase;">Total Grievances Reported</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--color-asphalt); line-height: 1.2; margin-top: 0.25rem;">{{ user_violations.count }}</div>
+    <div class="stats-grid mb-4">
+        <div class="stat-card" style="border-left: 4px solid var(--color-primary);">
+            <div class="stat-label">Total Grievances Reported</div>
+            <div class="stat-value" style="color: var(--color-primary);">{{ user_violations.count }}</div>
         </div>
-        <div class="civic-panel" style="margin: 0; border-left: 4px solid var(--color-resolved);">
-            <div style="color: var(--color-resolved); font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase;">Verified Resolutions</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--color-resolved); line-height: 1.2; margin-top: 0.25rem;">{{ resolved_count }}</div>
+        <div class="stat-card" style="border-left: 4px solid var(--status-resolved-solid);">
+            <div class="stat-label">Verified Resolutions</div>
+            <div class="stat-value text-resolved">{{ resolved_count }}</div>
         </div>
-        <div class="civic-panel" style="margin: 0; border-left: 4px solid var(--color-adopted);">
-            <div style="color: #7A5314; font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase;">Cumulative Impact Score</div>
-            <div style="font-size: 2rem; font-weight: 700; color: #7A5314; line-height: 1.2; margin-top: 0.25rem;">{{ civic_score }} pts</div>
+        <div class="stat-card" style="border-left: 4px solid var(--status-adopted-solid);">
+            <div class="stat-label">Cumulative Impact Score</div>
+            <div class="stat-value text-adopted">{{ civic_score }} <span style="font-size: 1rem; font-weight: 600;">pts</span></div>
         </div>
     </div>
 
     <!-- User's Reported Incidents Table -->
-    <div class="civic-panel">
-        <div class="civic-panel-header">
-            <h3 class="civic-panel-title"><i class="fas fa-list-check"></i> Your Incident History</h3>
-            <a href="{% url 'report_violation' %}" class="btn-civic btn-civic-hazard btn-civic-sm">Report New Incident</a>
+    <div class="modern-card" style="padding: 1.5rem;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
+            <div>
+                <h3 style="font-size: 1.15rem; margin: 0;"><i class="fas fa-list-check text-primary me-2"></i> Your Incident History</h3>
+                <p class="text-muted" style="font-size: 0.8125rem; margin: 0.25rem 0 0 0;">All infrastructure defects reported from your account</p>
+            </div>
+            <a href="{% url 'report_violation' %}" class="btn-modern btn-modern-hazard btn-modern-sm">
+                <i class="fas fa-plus-circle me-1"></i> Report New Incident
+            </a>
         </div>
 
-        <div class="civic-table-container">
-            <table class="civic-table">
+        <div class="modern-table-container">
+            <table class="modern-table">
                 <thead>
                     <tr>
                         <th>Incident Title</th>
                         <th>Category</th>
                         <th>Status</th>
                         <th>Date Reported</th>
-                        <th>Action</th>
+                        <th style="text-align: right;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for v in user_violations %}
                         <tr>
-                            <td><strong>{{ v.title }}</strong></td>
-                            <td><span class="category-tag">{{ v.get_category_display }}</span></td>
+                            <td>
+                                <strong>{{ v.title }}</strong>
+                                <div class="text-muted" style="font-size: 0.75rem;">{{ v.address|default:"Location Recorded" }}</div>
+                            </td>
+                            <td><span class="badge-category">{{ v.get_category_display }}</span></td>
                             <td>
                                 {% if v.status == 'Pending' %}
-                                    <span class="status-badge status-badge-pending">Pending</span>
+                                    <span class="status-pill status-pill-pending"><span class="pulse-dot"></span> Pending</span>
                                 {% elif v.status == 'Adopted' %}
-                                    <span class="status-badge status-badge-adopted">Adopted</span>
+                                    <span class="status-pill status-pill-adopted"><span class="pulse-dot"></span> Adopted</span>
                                 {% elif v.status == 'Pending Verification' %}
-                                    <span class="status-badge status-badge-verification">Verification</span>
+                                    <span class="status-pill status-pill-verification"><span class="pulse-dot"></span> Verification</span>
                                 {% elif v.status == 'Resolved' %}
-                                    <span class="status-badge status-badge-resolved">Resolved</span>
+                                    <span class="status-pill status-pill-resolved"><i class="fas fa-check me-1"></i> Resolved</span>
                                 {% else %}
-                                    <span class="status-badge status-badge-rejected">{{ v.status }}</span>
+                                    <span class="status-pill status-pill-pending">{{ v.status }}</span>
                                 {% endif %}
                             </td>
-                            <td style="font-size: var(--font-size-xs); color: var(--color-muted);">{{ v.created_at|date:"M d, Y" }}</td>
-                            <td>
-                                <a href="{% url 'violation_detail' v.id %}" class="btn-civic btn-civic-secondary btn-civic-sm">Inspect</a>
+                            <td style="font-size: 0.8125rem; color: var(--text-muted);">{{ v.created_at|date:"M d, Y" }}</td>
+                            <td style="text-align: right;">
+                                <a href="{% url 'violation_detail' v.id %}" class="btn-modern btn-modern-secondary btn-modern-sm">
+                                    <i class="fas fa-eye me-1"></i> Inspect
+                                </a>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="5" class="text-center text-muted py-4">You have not submitted any municipal incident reports yet.</td>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                <i class="fas fa-inbox fa-2x mb-2 d-block text-muted" style="opacity: 0.4;"></i>
+                                You have not submitted any municipal incident reports yet.
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

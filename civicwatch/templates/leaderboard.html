@@ -1,121 +1,164 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}CivicWatch :: Public Contribution Registry{% endblock %}
+{% block title %}CivicWatch :: Community Impact Leaderboard{% endblock %}
 
 {% block content %}
-<div class="civic-container-narrow">
+<div class="main-container-narrow">
 
-    <!-- Registry Header -->
-    <div class="civic-panel" style="padding: 1.25rem; margin-bottom: 1.5rem;">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div>
-                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;"><i class="fas fa-clipboard-user me-1"></i> Public Contribution Registry</h1>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Official civic impact ledger recording verified reporting, remediation work, and community credits.</p>
+    <!-- Leaderboard Header -->
+    <div class="text-center mb-4">
+        <div class="d-inline-flex align-items-center gap-2 mb-2">
+            <span class="badge-category"><i class="fas fa-trophy text-warning me-1"></i> Public Honor Roll</span>
+        </div>
+        <h1 style="font-size: 2rem; margin-bottom: 0.35rem;">Community Impact Leaderboard</h1>
+        <p class="text-muted" style="font-size: 0.9375rem; max-width: 540px; margin: 0 auto;">
+            Recognizing top citizens and verified community organizations driving physical municipal remediation.
+        </p>
+    </div>
+
+    <!-- Category Tabs -->
+    <div class="d-flex justify-content-center gap-2 mb-4">
+        <button type="button" class="btn-modern btn-modern-primary" id="btn-citizens" onclick="switchLeaderboard('citizens')">
+            <i class="fas fa-users me-1"></i> Citizen Watchers
+        </button>
+        <button type="button" class="btn-modern btn-modern-secondary" id="btn-heroes" onclick="switchLeaderboard('heroes')">
+            <i class="fas fa-hand-holding-heart me-1"></i> Community Heroes (NGOs/Volunteers)
+        </button>
+    </div>
+
+    <!-- 1. Citizens Leaderboard -->
+    <div id="board-citizens">
+        
+        <!-- Top 3 Podium (Citizens) -->
+        {% if top_citizens|length >= 3 %}
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; align-items: end;">
+                
+                <!-- #2 Silver -->
+                {% with user2=top_citizens.1 %}
+                <div class="modern-card text-center" style="padding: 1.25rem 1rem; border-top: 4px solid #94A3B8; background: linear-gradient(180deg, #F8FAFC, #FFFFFF);">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🥈</div>
+                    <div class="user-avatar-initials mx-auto mb-2" style="width: 36px; height: 36px; font-size: 14px; background: #94A3B8;">
+                        {{ user2.username|make_list|first|upper }}
+                    </div>
+                    <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">{{ user2.username }}</h4>
+                    <span class="badge-status badge-status-resolved">{{ user2.civic_points }} pts</span>
+                </div>
+                {% endwith %}
+
+                <!-- #1 Gold -->
+                {% with user1=top_citizens.0 %}
+                <div class="modern-card text-center" style="padding: 1.75rem 1rem; border-top: 4px solid #F59E0B; background: linear-gradient(180deg, #FFFBEB, #FFFFFF); box-shadow: var(--shadow-lg);">
+                    <div style="font-size: 2rem; margin-bottom: 0.25rem;">🥇</div>
+                    <div class="user-avatar-initials mx-auto mb-2" style="width: 44px; height: 44px; font-size: 16px; background: #F59E0B;">
+                        {{ user1.username|make_list|first|upper }}
+                    </div>
+                    <h4 style="font-size: 1.05rem; margin-bottom: 0.25rem;">{{ user1.username }}</h4>
+                    <span class="badge-status badge-status-resolved" style="font-size: 0.8125rem;">{{ user1.civic_points }} pts</span>
+                </div>
+                {% endwith %}
+
+                <!-- #3 Bronze -->
+                {% with user3=top_citizens.2 %}
+                <div class="modern-card text-center" style="padding: 1.25rem 1rem; border-top: 4px solid #D97706; background: linear-gradient(180deg, #F8FAFC, #FFFFFF);">
+                    <div style="font-size: 1.5rem; margin-bottom: 0.25rem;">🥉</div>
+                    <div class="user-avatar-initials mx-auto mb-2" style="width: 36px; height: 36px; font-size: 14px; background: #D97706;">
+                        {{ user3.username|make_list|first|upper }}
+                    </div>
+                    <h4 style="font-size: 0.95rem; margin-bottom: 0.25rem;">{{ user3.username }}</h4>
+                    <span class="badge-status badge-status-resolved">{{ user3.civic_points }} pts</span>
+                </div>
+                {% endwith %}
+
             </div>
-            <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Return to Incident List</a>
+        {% endif %}
+
+        <!-- Full Table -->
+        <div class="modern-card" style="padding: 0;">
+            <div class="modern-table-container" style="border: none;">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 15%;">Rank</th>
+                            <th style="width: 55%;">Citizen Account</th>
+                            <th style="width: 30%; text-align: right;">Civic Credits</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in top_citizens %}
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--text-primary);">#{{ forloop.counter }}</strong>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="user-avatar-initials" style="width: 26px; height: 26px; font-size: 11px;">
+                                            {{ u.username|make_list|first|upper }}
+                                        </div>
+                                        <a href="{% url 'public_profile' u.username %}" style="color: var(--text-primary); text-decoration: none; font-weight: 700;">
+                                            {{ u.username }}
+                                        </a>
+                                        {% if u.is_superuser %}
+                                            <span class="badge-category" style="font-size: 10px; padding: 2px 6px;">Admin</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td style="text-align: right;">
+                                    <span class="badge-status badge-status-resolved">{{ u.civic_points }} pts</span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3" class="text-center text-muted py-4">No verified citizen points awarded yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Section Switcher Tabs -->
-    <div class="d-flex gap-2 mb-3">
-        <button type="button" class="btn-civic btn-civic-primary" id="btn-citizens" onclick="switchLedger('citizens')">
-            <i class="fas fa-users me-1"></i> Citizen Reporters (Watchers)
-        </button>
-        <button type="button" class="btn-civic btn-civic-secondary" id="btn-heroes" onclick="switchLedger('heroes')">
-            <i class="fas fa-hand-holding-hand me-1"></i> Remediation Entities (Volunteers & NGOs)
-        </button>
-    </div>
-
-    <!-- 1. Citizens Ledger -->
-    <div id="ledger-citizens" class="civic-panel" style="padding: 0;">
-        <div class="civic-panel-header" style="background-color: var(--color-concrete); padding: 0.75rem 1rem; margin-bottom: 0;">
-            <h3 class="civic-panel-title"><i class="fas fa-bullhorn"></i> Citizen Grievance Reporting Registry</h3>
-            <span class="category-tag">Ranked by Verified Impact</span>
-        </div>
-
-        <div class="civic-table-container" style="border: none;">
-            <table class="civic-table">
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">Standing</th>
-                        <th style="width: 55%;">Citizen Account</th>
-                        <th style="width: 30%; text-align: right;">Civic Credits</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in top_citizens %}
+    <!-- 2. Heroes Leaderboard -->
+    <div id="board-heroes" style="display: none;">
+        <div class="modern-card" style="padding: 0;">
+            <div class="modern-table-container" style="border: none;">
+                <table class="modern-table">
+                    <thead>
                         <tr>
-                            <td>
-                                <strong>#{{ forloop.counter }}</strong>
-                            </td>
-                            <td>
-                                <a href="{% url 'public_profile' u.username %}" style="color: var(--color-asphalt); text-decoration: none; font-weight: 700;">
-                                    {{ u.username }}
-                                </a>
-                                {% if u.is_superuser %}
-                                    <span class="category-tag ms-1">Admin</span>
-                                {% endif %}
-                            </td>
-                            <td style="text-align: right;">
-                                <span class="status-badge status-badge-resolved">{{ u.civic_points }} pts</span>
-                            </td>
+                            <th style="width: 15%;">Rank</th>
+                            <th style="width: 45%;">Entity Name</th>
+                            <th style="width: 20%;">Role</th>
+                            <th style="width: 20%; text-align: right;">Impact Points</th>
                         </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="3" class="text-center text-muted py-4">No verified citizen credits recorded yet.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- 2. Heroes Ledger -->
-    <div id="ledger-heroes" class="civic-panel" style="display: none; padding: 0;">
-        <div class="civic-panel-header" style="background-color: var(--color-concrete); padding: 0.75rem 1rem; margin-bottom: 0;">
-            <h3 class="civic-panel-title"><i class="fas fa-screwdriver-wrench"></i> Remediation & Public Works Registry</h3>
-            <span class="category-tag">Verified Volunteers & NGOs</span>
-        </div>
-
-        <div class="civic-table-container" style="border: none;">
-            <table class="civic-table">
-                <thead>
-                    <tr>
-                        <th style="width: 15%;">Standing</th>
-                        <th style="width: 45%;">Entity Name</th>
-                        <th style="width: 20%;">Role</th>
-                        <th style="width: 20%; text-align: right;">Civic Credits</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for u in top_heroes %}
-                        <tr>
-                            <td>
-                                <strong>#{{ forloop.counter }}</strong>
-                            </td>
-                            <td>
-                                <a href="{% url 'public_profile' u.username %}" style="color: var(--color-asphalt); text-decoration: none; font-weight: 700;">
-                                    {{ u.username }}
-                                </a>
-                                {% if u.is_verified %}
-                                    <i class="fas fa-certificate text-success ms-1" title="Verified Worker"></i>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="category-tag">{{ u.get_role_display }}</span>
-                            </td>
-                            <td style="text-align: right;">
-                                <span class="status-badge status-badge-resolved">{{ u.civic_points }} pts</span>
-                            </td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">No remediation entities registered yet.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {% for u in top_heroes %}
+                            <tr>
+                                <td>
+                                    <strong style="color: var(--text-primary);">#{{ forloop.counter }}</strong>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="user-avatar-initials" style="width: 26px; height: 26px; font-size: 11px; background: linear-gradient(135deg, #10B981, #059669);">
+                                            {{ u.username|make_list|first|upper }}
+                                        </div>
+                                        <a href="{% url 'public_profile' u.username %}" style="color: var(--text-primary); text-decoration: none; font-weight: 700;">
+                                            {{ u.username }}
+                                        </a>
+                                        {% if u.is_verified %}
+                                            <i class="fas fa-certificate text-success" title="Verified Worker"></i>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td><span class="badge-category">{{ u.get_role_display }}</span></td>
+                                <td style="text-align: right;">
+                                    <span class="badge-status badge-status-resolved">{{ u.civic_points }} pts</span>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="4" class="text-center text-muted py-4">No community workers registered yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -124,22 +167,22 @@
 
 {% block extra_js %}
 <script>
-function switchLedger(type) {
-    const cLedger = document.getElementById('ledger-citizens');
-    const hLedger = document.getElementById('ledger-heroes');
+function switchLeaderboard(type) {
+    const cBoard = document.getElementById('board-citizens');
+    const hBoard = document.getElementById('board-heroes');
     const cBtn = document.getElementById('btn-citizens');
     const hBtn = document.getElementById('btn-heroes');
 
     if (type === 'citizens') {
-        cLedger.style.display = 'block';
-        hLedger.style.display = 'none';
-        cBtn.className = 'btn-civic btn-civic-primary';
-        hBtn.className = 'btn-civic btn-civic-secondary';
+        cBoard.style.display = 'block';
+        hBoard.style.display = 'none';
+        cBtn.className = 'btn-modern btn-modern-primary';
+        hBtn.className = 'btn-modern btn-modern-secondary';
     } else {
-        cLedger.style.display = 'none';
-        hLedger.style.display = 'block';
-        cBtn.className = 'btn-civic btn-civic-secondary';
-        hBtn.className = 'btn-civic btn-civic-primary';
+        cBoard.style.display = 'none';
+        hBoard.style.display = 'block';
+        cBtn.className = 'btn-modern btn-modern-secondary';
+        hBtn.className = 'btn-modern btn-modern-primary';
     }
 }
 </script>

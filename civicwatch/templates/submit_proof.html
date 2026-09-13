@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}CivicWatch :: Submit Remediation Proof #{{ v.id }}{% endblock %}
+{% block title %}CivicWatch :: Submit Resolution Proof #{{ v.id }}{% endblock %}
 
 {% block content %}
-<div class="civic-container-narrow">
-    <div class="civic-panel">
-        <div class="civic-panel-header">
+<div class="main-container-narrow">
+    <div class="modern-card">
+        <div class="modern-card-header">
             <div>
-                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Submit Remediation Proof & Audit Photos</h1>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Provide physical evidence of defect rectification for Incident #{{ v.id }}: <strong>{{ v.title }}</strong></p>
+                <h1 style="font-size: 1.6rem; margin: 0 0 0.25rem 0;"><i class="fas fa-upload text-primary me-2"></i>Submit Resolution Proof</h1>
+                <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Upload completed photographic evidence for Incident #{{ v.id }}: <strong>{{ v.title }}</strong></p>
             </div>
-            <a href="{% url 'violation_detail' v.id %}" class="btn-civic btn-civic-secondary btn-civic-sm">Cancel</a>
+            <a href="{% url 'violation_detail' v.id %}" class="btn-modern btn-modern-secondary btn-modern-sm">Cancel</a>
         </div>
 
         {% if form.non_field_errors %}
-            <div class="civic-alert civic-alert-danger">
+            <div class="modern-alert modern-alert-danger">
                 <i class="fas fa-triangle-exclamation"></i>
                 <div>
                     {% for error in form.non_field_errors %}
@@ -28,52 +28,52 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
 
-            <!-- Reference Before Photo -->
+            <!-- Reference Initial Defect Photo -->
             {% if v.image %}
-                <div class="civic-panel" style="background-color: var(--color-concrete); margin-bottom: 1.5rem; padding: 1rem;">
-                    <label class="civic-label" style="font-weight: 700;">Original Defect Photograph (Reference):</label>
-                    <img src="{{ v.image.url }}" alt="Original Defect" style="max-height: 220px; width: 100%; object-fit: cover; border: 1px solid var(--color-asphalt); border-radius: var(--radius-sm);">
+                <div class="modern-card mb-4" style="background-color: #F8FAFC; padding: 1.25rem;">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <label class="modern-label" style="margin: 0;">Initial Defect Photograph (Reference):</label>
+                        <span class="badge-status badge-status-pending">Before Photo</span>
+                    </div>
+                    <img src="{{ v.image.url }}" alt="Original Defect" style="max-height: 220px; width: 100%; object-fit: cover; border-radius: var(--radius-md); border: 1px solid var(--border-light);">
                 </div>
             {% endif %}
 
-            <!-- Update Before Photo (Optional) -->
-            <div class="civic-form-group">
-                <label for="id_before_photo" class="civic-label">Update "Before" Photo (Optional):</label>
+            <!-- Update Before Photo -->
+            <div class="modern-form-group">
+                <label for="id_before_photo" class="modern-label">Update "Before" Photo (Optional):</label>
                 {{ form.before_photo }}
-                <div class="civic-help-text">Leave blank to use the original reporter's photograph.</div>
+                <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Leave empty to keep the initial reporting photo.</div>
                 {% if form.before_photo.errors %}
-                    <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600;">
+                    <div style="color: var(--status-pending-text); font-size: 0.8125rem; font-weight: 700;">
                         {{ form.before_photo.errors|join:", " }}
                     </div>
                 {% endif %}
             </div>
 
             <!-- Upload After Resolution Photos -->
-            <div class="civic-form-group">
-                <label class="civic-label" style="font-weight: 700;">
-                    <i class="fas fa-camera me-1"></i> Upload "After" Completed Resolution Photos:
+            <div class="modern-form-group">
+                <label class="modern-label" style="font-size: 0.95rem;">
+                    <i class="fas fa-camera text-success me-1"></i> Upload "After" Resolution Photographs:
                 </label>
-                <input type="file" name="after_photos" class="civic-input" multiple required>
-                <div class="civic-help-text">Select one or more clear photographs demonstrating completed physical remediation. Max 5MB per image.</div>
+                <input type="file" name="after_photos" class="modern-input" multiple required>
+                <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.25rem;">Select one or more clear photographs showing completed on-site remediation. Max size: 5MB.</div>
             </div>
 
             <!-- Work Description Summary -->
-            <div class="civic-form-group">
-                <label for="id_work_description" class="civic-label">Remediation Log & Materials Used:</label>
+            <div class="modern-form-group">
+                <label for="id_work_description" class="modern-label">Remediation Work Summary & Materials Used:</label>
                 {{ form.work_description }}
                 {% if form.work_description.errors %}
-                    <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600;">
+                    <div style="color: var(--status-pending-text); font-size: 0.8125rem; font-weight: 700;">
                         {{ form.work_description.errors|join:", " }}
                     </div>
                 {% endif %}
             </div>
 
-            <!-- Submit Action -->
-            <div class="d-flex gap-2">
-                <button type="submit" class="btn-civic btn-civic-action btn-civic-lg btn-civic-full">
-                    <i class="fas fa-paper-plane me-1"></i> Submit Work Proof for Verification
-                </button>
-            </div>
+            <button type="submit" class="btn-modern btn-modern-success btn-modern-lg btn-modern-full" style="padding: 0.85rem;">
+                <i class="fas fa-paper-plane me-2"></i> Submit for Community Verification
+            </button>
         </form>
     </div>
 </div>

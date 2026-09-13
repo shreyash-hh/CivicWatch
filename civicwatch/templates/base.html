@@ -5,63 +5,64 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <title>{% block title %}CivicWatch :: Municipal Issue Registry{% endblock %}</title>
+    <title>{% block title %}CivicWatch :: Modern Civic Infrastructure Platform{% endblock %}</title>
 
-    <!-- Google Font: IBM Plex Sans -->
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- FontAwesome for Utility Icons -->
+    <!-- FontAwesome Pro/Free Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Leaflet GIS Map CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
-    <!-- CivicWatch Municipal Design System CSS -->
+    <!-- CivicWatch Modern Design System CSS -->
     <link rel="stylesheet" href="{% static 'css/civicwatch.css' %}">
 
     {% block extra_head %}{% endblock %}
 </head>
 <body>
 
-    <!-- Official Municipal Header -->
-    <header class="civic-nav">
-        <div class="civic-nav-inner">
-            <a href="{% url 'home' %}" class="civic-brand">
-                <span class="civic-brand-mark">CW-REG</span>
-                <span class="civic-brand-title">CivicWatch</span>
-                <span class="civic-brand-sub">Municipal Incident Registry & Resolution System</span>
+    <!-- Sticky Glassmorphic Navbar -->
+    <header class="modern-navbar">
+        <div class="navbar-container">
+            <a href="{% url 'home' %}" class="brand-wrapper">
+                <span class="brand-badge"><i class="fas fa-city me-1"></i>CW</span>
+                <span class="brand-title">CivicWatch</span>
+                <span class="brand-tag">GovTech Portal</span>
             </a>
 
             <nav>
-                <ul class="civic-nav-links">
-                    <li><a href="{% url 'map' %}" class="civic-nav-link"><i class="fas fa-map-location-dot me-1"></i> Live Map</a></li>
-                    <li><a href="{% url 'violation_list' %}" class="civic-nav-link"><i class="fas fa-list-check me-1"></i> Incidents</a></li>
-                    <li><a href="{% url 'dashboard' %}" class="civic-nav-link"><i class="fas fa-chart-column me-1"></i> Analytics</a></li>
-                    <li><a href="{% url 'leaderboard' %}" class="civic-nav-link"><i class="fas fa-clipboard-user me-1"></i> Public Registry</a></li>
+                <ul class="nav-links-wrapper">
+                    <li><a href="{% url 'home' %}" class="nav-item-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}"><i class="fas fa-map-location-dot"></i> Live Map</a></li>
+                    <li><a href="{% url 'violation_list' %}" class="nav-item-link {% if request.resolver_match.url_name == 'violation_list' %}active{% endif %}"><i class="fas fa-list-check"></i> Incidents</a></li>
+                    <li><a href="{% url 'dashboard' %}" class="nav-item-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"><i class="fas fa-chart-pie"></i> Analytics</a></li>
+                    <li><a href="{% url 'leaderboard' %}" class="nav-item-link {% if request.resolver_match.url_name == 'leaderboard' %}active{% endif %}"><i class="fas fa-trophy"></i> Leaderboard</a></li>
                     
                     {% if user.is_authenticated %}
                         <li>
-                            <a href="{% url 'profile' %}" class="civic-nav-link">
-                                <i class="fas fa-user-shield me-1"></i> {{ user.username }} 
-                                <span class="category-tag ms-1">{{ user.civic_points }} pts</span>
+                            <a href="{% url 'profile' %}" class="user-chip">
+                                <div class="user-avatar-initials">{{ user.username|make_list|first|upper }}</div>
+                                <span>{{ user.username }}</span>
+                                <span class="user-points-pill">{{ user.civic_points }} pts</span>
                             </a>
                         </li>
                         <li>
-                            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                            <form action="{% url 'logout' %}" method="post" style="display:inline; margin: 0;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn-civic btn-civic-secondary btn-civic-sm">Log out</button>
+                                <button type="submit" class="btn-modern btn-modern-secondary btn-modern-sm">Log out</button>
                             </form>
                         </li>
                     {% else %}
-                        <li><a href="{% url 'login' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Log in</a></li>
-                        <li><a href="{% url 'register' %}" class="btn-civic btn-civic-primary btn-civic-sm">Register</a></li>
+                        <li><a href="{% url 'login' %}" class="btn-modern btn-modern-secondary btn-modern-sm">Log In</a></li>
+                        <li><a href="{% url 'register' %}" class="btn-modern btn-modern-primary btn-modern-sm">Register</a></li>
                     {% endif %}
 
                     <li>
-                        <a href="{% url 'report_violation' %}" class="btn-civic btn-civic-hazard btn-civic-sm">
-                            <i class="fas fa-circle-exclamation me-1"></i> Report Incident
+                        <a href="{% url 'report_violation' %}" class="btn-modern btn-modern-hazard btn-modern-sm">
+                            <i class="fas fa-plus-circle me-1"></i> Report Issue
                         </a>
                     </li>
                 </ul>
@@ -69,12 +70,12 @@
         </div>
     </header>
 
-    <!-- Global Flash Messages -->
+    <!-- Global Alert Banners -->
     {% if messages %}
-        <div class="civic-container" style="padding-bottom: 0;">
+        <div class="main-container" style="padding-bottom: 0;">
             {% for message in messages %}
-                <div class="civic-alert {% if message.tags == 'error' or message.tags == 'danger' %}civic-alert-danger{% elif message.tags == 'success' %}civic-alert-success{% elif message.tags == 'warning' %}civic-alert-warning{% else %}civic-alert-info{% endif %}" role="alert">
-                    <i class="fas {% if message.tags == 'error' or message.tags == 'danger' %}fa-circle-xmark{% elif message.tags == 'success' %}fa-circle-check{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %} mt-1"></i>
+                <div class="modern-alert {% if message.tags == 'error' or message.tags == 'danger' %}modern-alert-danger{% elif message.tags == 'success' %}modern-alert-success{% elif message.tags == 'warning' %}modern-alert-warning{% else %}modern-alert-info{% endif %}">
+                    <i class="fas {% if message.tags == 'error' or message.tags == 'danger' %}fa-circle-exclamation{% elif message.tags == 'success' %}fa-circle-check{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %} mt-1"></i>
                     <div>{{ message }}</div>
                 </div>
             {% endfor %}
@@ -86,18 +87,18 @@
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Official Municipal Footer -->
-    <footer class="civic-footer">
-        <div class="civic-footer-inner">
-            <div>
-                <strong>CivicWatch Municipal Infrastructure Registry</strong> &mdash; Operating in public interest for civic resolution audits.
+    <!-- Modern Footer -->
+    <footer class="modern-footer">
+        <div class="footer-container">
+            <div class="d-flex align-items-center gap-2">
+                <span class="brand-badge" style="padding: 0.2rem 0.45rem; font-size: 0.7rem;">CW</span>
+                <strong>CivicWatch &mdash; Crowdsourced Municipal Action Platform</strong>
             </div>
-            <div>
-                <span>Standard Status Protocol: </span>
-                <span class="status-badge status-badge-pending">Hazard: Pending</span>
-                <span class="status-badge status-badge-adopted ms-1">Adopted</span>
-                <span class="status-badge status-badge-verification ms-1">Verification</span>
-                <span class="status-badge status-badge-resolved ms-1">Resolved</span>
+            <div class="d-flex align-items-center gap-3">
+                <span class="badge-status badge-status-pending"><span class="status-indicator-dot dot-pending"></span> Pending</span>
+                <span class="badge-status badge-status-adopted"><span class="status-indicator-dot dot-adopted"></span> In Progress</span>
+                <span class="badge-status badge-status-verification"><span class="status-indicator-dot dot-verification"></span> Verification</span>
+                <span class="badge-status badge-status-resolved"><span class="status-indicator-dot dot-resolved"></span> Resolved</span>
             </div>
         </div>
     </footer>

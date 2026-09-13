@@ -1,75 +1,94 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}CivicWatch :: Municipal Data Analytics & Audit Dashboard{% endblock %}
+{% block title %}CivicWatch :: Analytics & Audit Dashboard{% endblock %}
 
 {% block content %}
-<div class="civic-container">
+<div class="main-container">
 
     <!-- Dashboard Header -->
-    <div class="civic-panel" style="padding: 1rem 1.25rem; margin-bottom: 1.5rem;">
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            <div>
-                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Municipal Incident Analytics</h1>
-                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Aggregated status counts, category distributions, and administrative resolution queue.</p>
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge-category"><i class="fas fa-chart-line text-primary me-1"></i> Data Insights</span>
+                <span class="text-muted" style="font-size: 0.8125rem;">Real-time municipal performance metrics</span>
             </div>
-            <div>
-                {% if user.is_superuser or user.role == 'admin' %}
-                    <a href="{% url 'export_csv' %}" class="btn-civic btn-civic-secondary btn-civic-sm">
-                        <i class="fas fa-file-csv me-1"></i> Export Audit Registry (CSV)
-                    </a>
-                {% endif %}
-            </div>
+            <h1 style="font-size: 1.75rem; margin-bottom: 0.25rem;">Analytics & Audit Dashboard</h1>
+            <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Comprehensive breakdown of reported grievances, resolution velocity, and administrative verification queues.</p>
+        </div>
+
+        <div>
+            {% if user.is_superuser or user.role == 'admin' %}
+                <a href="{% url 'export_csv' %}" class="btn-modern btn-modern-secondary">
+                    <i class="fas fa-download me-1"></i> Export CSV Registry
+                </a>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Status Metric Cards (Strict 4 Colors) -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+    <!-- Status Metric Cards (4 Vibrant Modern Cards) -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
         
         <!-- Total -->
-        <div class="civic-panel" style="margin-bottom: 0; border-left: 4px solid var(--color-asphalt);">
-            <div class="text-muted" style="font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase;">Total Complaints</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--color-asphalt); line-height: 1.2; margin-top: 0.25rem;">{{ total }}</div>
+        <div class="modern-card" style="margin: 0; border-top: 4px solid #0F172A;">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted" style="font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Total Grievances</span>
+                <i class="fas fa-folder-open text-muted"></i>
+            </div>
+            <div style="font-size: 2.25rem; font-weight: 800; color: #0F172A; line-height: 1.1;">{{ total }}</div>
+            <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.5rem;">All lifetime reported issues</div>
         </div>
 
         <!-- Pending -->
-        <div class="civic-panel" style="margin-bottom: 0; border-left: 4px solid var(--color-pending);">
-            <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase;">Hazard: Pending</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--color-pending); line-height: 1.2; margin-top: 0.25rem;">{{ pending }}</div>
+        <div class="modern-card" style="margin: 0; border-top: 4px solid var(--status-pending-solid);">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span style="color: var(--status-pending-text); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Hazard: Pending</span>
+                <i class="fas fa-triangle-exclamation" style="color: var(--status-pending-solid);"></i>
+            </div>
+            <div style="font-size: 2.25rem; font-weight: 800; color: var(--status-pending-text); line-height: 1.1;">{{ pending }}</div>
+            <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.5rem;">Awaiting volunteer adoption</div>
         </div>
 
-        <!-- Waiting Approval / Verification -->
-        <div class="civic-panel" style="margin-bottom: 0; border-left: 4px solid var(--color-verification);">
-            <div style="color: var(--color-verification); font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase;">Pending Verification</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--color-verification); line-height: 1.2; margin-top: 0.25rem;">{{ waiting_approval }}</div>
+        <!-- In Verification -->
+        <div class="modern-card" style="margin: 0; border-top: 4px solid var(--status-verification-solid);">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span style="color: var(--status-verification-text); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">In Verification</span>
+                <i class="fas fa-clock" style="color: var(--status-verification-solid);"></i>
+            </div>
+            <div style="font-size: 2.25rem; font-weight: 800; color: var(--status-verification-text); line-height: 1.1;">{{ waiting_approval }}</div>
+            <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.5rem;">Proof uploaded & awaiting audit</div>
         </div>
 
         <!-- Resolved -->
-        <div class="civic-panel" style="margin-bottom: 0; border-left: 4px solid var(--color-resolved);">
-            <div style="color: var(--color-resolved); font-size: var(--font-size-xs); font-weight: 700; text-transform: uppercase;">Resolved & Verified</div>
-            <div style="font-size: 2rem; font-weight: 700; color: var(--color-resolved); line-height: 1.2; margin-top: 0.25rem;">{{ resolved }}</div>
+        <div class="modern-card" style="margin: 0; border-top: 4px solid var(--status-resolved-solid);">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span style="color: var(--status-resolved-text); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Resolved & Certified</span>
+                <i class="fas fa-check-circle" style="color: var(--status-resolved-solid);"></i>
+            </div>
+            <div style="font-size: 2.25rem; font-weight: 800; color: var(--status-resolved-text); line-height: 1.1;">{{ resolved }}</div>
+            <div class="text-muted" style="font-size: 0.75rem; margin-top: 0.5rem;">Remediated with proof</div>
         </div>
 
     </div>
 
-    <!-- Verification Audit Queue -->
+    <!-- Verification Review Queue -->
     {% if verification_queue %}
-        <div class="civic-panel" style="border: 2px solid var(--color-verification); margin-bottom: 1.5rem;">
-            <div class="civic-panel-header" style="background-color: var(--color-concrete); padding: 0.75rem 1rem; margin: -1.25rem -1.25rem 1rem -1.25rem;">
-                <h3 class="civic-panel-title" style="color: var(--color-verification);">
-                    <i class="fas fa-clipboard-check"></i> Verification & Audit Queue (Pending Approval)
+        <div class="modern-card mb-4" style="border: 2px solid var(--status-verification-border); background: linear-gradient(180deg, #EFF6FF, #FFFFFF);">
+            <div class="modern-card-header">
+                <h3 class="card-title-main" style="color: var(--status-verification-text);">
+                    <i class="fas fa-clipboard-check"></i> Verification Queue (Action Required)
                 </h3>
-                <span class="status-badge status-badge-verification">{{ verification_queue.count }} pending review</span>
+                <span class="badge-status badge-status-verification">{{ verification_queue.count }} pending review</span>
             </div>
 
-            <div class="civic-table-container">
-                <table class="civic-table">
+            <div class="modern-table-container">
+                <table class="modern-table">
                     <thead>
                         <tr>
-                            <th>Incident Title & Location</th>
+                            <th>Incident Title & Details</th>
                             <th>Assigned Worker</th>
                             <th>Submitted On</th>
-                            <th>Audit Action</th>
+                            <th style="text-align: right;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,16 +96,23 @@
                             <tr>
                                 <td>
                                     <strong>{{ q.title }}</strong>
-                                    <div style="font-size: var(--font-size-xs); color: var(--color-muted);">{{ q.get_category_display }} &bull; {{ q.location }}</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted);">{{ q.get_category_display }} &bull; {{ q.location }}</div>
                                 </td>
                                 <td>
-                                    <strong>{{ q.adopted_by.username }}</strong>
-                                    <div style="font-size: var(--font-size-xs); color: var(--color-muted);">{{ q.adopted_by.get_role_display }}</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="user-avatar-initials" style="width: 24px; height: 24px; font-size: 10px;">
+                                            {{ q.adopted_by.username|make_list|first|upper }}
+                                        </div>
+                                        <div>
+                                            <strong>{{ q.adopted_by.username }}</strong>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">{{ q.adopted_by.get_role_display }}</div>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td style="font-size: var(--font-size-xs);">{{ q.submission.submitted_at|date:"M d, Y H:i" }}</td>
-                                <td>
-                                    <a href="{% url 'violation_detail' q.id %}" class="btn-civic btn-civic-primary btn-civic-sm">
-                                        Inspect Proof & Verify
+                                <td style="font-size: 0.8125rem;">{{ q.submission.submitted_at|date:"M d, Y H:i" }}</td>
+                                <td style="text-align: right;">
+                                    <a href="{% url 'violation_detail' q.id %}" class="btn-modern btn-modern-primary btn-modern-sm">
+                                        Inspect & Verify Proof
                                     </a>
                                 </td>
                             </tr>
@@ -98,12 +124,12 @@
     {% endif %}
 
     <!-- Charts Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
         
-        <!-- Category Breakdown -->
-        <div class="civic-panel" style="margin-bottom: 0;">
-            <div class="civic-panel-header">
-                <h3 class="civic-panel-title"><i class="fas fa-chart-bar"></i> Category Breakdown</h3>
+        <!-- Category Distribution -->
+        <div class="modern-card" style="margin: 0;">
+            <div class="modern-card-header">
+                <h3 class="card-title-main"><i class="fas fa-chart-bar text-primary"></i> Category Distribution</h3>
             </div>
             <div style="position: relative; height: 260px;">
                 <canvas id="categoryChart"></canvas>
@@ -111,9 +137,9 @@
         </div>
 
         <!-- Status Distribution -->
-        <div class="civic-panel" style="margin-bottom: 0;">
-            <div class="civic-panel-header">
-                <h3 class="civic-panel-title"><i class="fas fa-chart-pie"></i> Resolution Status Distribution</h3>
+        <div class="modern-card" style="margin: 0;">
+            <div class="modern-card-header">
+                <h3 class="card-title-main"><i class="fas fa-chart-pie text-primary"></i> Status Resolution Ratio</h3>
             </div>
             <div style="position: relative; height: 260px;">
                 <canvas id="statusChart"></canvas>
@@ -122,46 +148,46 @@
 
     </div>
 
-    <!-- Recent Complaints Table -->
-    <div class="civic-panel">
-        <div class="civic-panel-header">
-            <h3 class="civic-panel-title"><i class="fas fa-list"></i> Recent Audit Log Entries</h3>
-            <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">View Full Registry</a>
+    <!-- Recent Incident Table -->
+    <div class="modern-card">
+        <div class="modern-card-header">
+            <h3 class="card-title-main"><i class="fas fa-clock-rotate-left text-primary"></i> Recent Audit Log Entries</h3>
+            <a href="{% url 'violation_list' %}" class="btn-modern btn-modern-secondary btn-modern-sm">View All Incidents</a>
         </div>
 
-        <div class="civic-table-container">
-            <table class="civic-table">
+        <div class="modern-table-container">
+            <table class="modern-table">
                 <thead>
                     <tr>
-                        <th>Incident</th>
+                        <th>Incident Title</th>
                         <th>Category</th>
                         <th>Status</th>
-                        <th>Created</th>
+                        <th>Date Reported</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in recent %}
                         <tr>
                             <td><strong>{{ r.title }}</strong></td>
-                            <td><span class="category-tag">{{ r.get_category_display }}</span></td>
+                            <td><span class="badge-category">{{ r.get_category_display }}</span></td>
                             <td>
                                 {% if r.status == 'Pending' %}
-                                    <span class="status-badge status-badge-pending">Pending</span>
+                                    <span class="badge-status badge-status-pending">Pending</span>
                                 {% elif r.status == 'Adopted' %}
-                                    <span class="status-badge status-badge-adopted">Adopted</span>
+                                    <span class="badge-status badge-status-adopted">Adopted</span>
                                 {% elif r.status == 'Pending Verification' %}
-                                    <span class="status-badge status-badge-verification">Verification</span>
+                                    <span class="badge-status badge-status-verification">Verification</span>
                                 {% elif r.status == 'Resolved' %}
-                                    <span class="status-badge status-badge-resolved">Resolved</span>
+                                    <span class="badge-status badge-status-resolved">Resolved</span>
                                 {% else %}
-                                    <span class="status-badge status-badge-rejected">{{ r.status }}</span>
+                                    <span class="badge-status badge-status-pending">{{ r.status }}</span>
                                 {% endif %}
                             </td>
-                            <td style="font-size: var(--font-size-xs); color: var(--color-muted);">{{ r.created_at|date:"M d, Y" }}</td>
+                            <td style="font-size: 0.8125rem; color: var(--text-muted);">{{ r.created_at|date:"M d, Y" }}</td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-3">No incident data recorded yet.</td>
+                            <td colspan="4" class="text-center text-muted py-4">No incident entries available.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -183,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function() {
         categoryLabels = JSON.parse('{{ category_labels|escapejs }}');
         categoryCounts = JSON.parse('{{ category_counts|escapejs }}');
     } catch (e) {
-        console.error("Data parsing error:", e);
+        console.error("Chart data parsing error:", e);
     }
 
     // Category Chart
@@ -194,9 +220,9 @@ document.addEventListener("DOMContentLoaded", function() {
             datasets: [{
                 label: 'Reported Incidents',
                 data: categoryCounts,
-                backgroundColor: '#2B2B2B',
-                borderColor: '#1A1A1A',
-                borderWidth: 1
+                backgroundColor: '#3B82F6',
+                borderRadius: 6,
+                borderSkipped: false
             }]
         },
         options: {
@@ -208,31 +234,31 @@ document.addEventListener("DOMContentLoaded", function() {
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { precision: 0, font: { family: 'IBM Plex Sans' } },
-                    grid: { color: '#E8E5DD' }
+                    ticks: { precision: 0, font: { family: 'Plus Jakarta Sans' } },
+                    grid: { color: '#F1F5F9' }
                 },
                 x: {
-                    ticks: { font: { family: 'IBM Plex Sans', size: 11 } },
+                    ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } },
                     grid: { display: false }
                 }
             }
         }
     });
 
-    // Status Chart using the strict 4-color status tokens
+    // Status Doughnut Chart
     new Chart(document.getElementById('statusChart'), {
         type: 'doughnut',
         data: {
-            labels: ['Hazard: Pending', 'Pending Verification', 'Resolved & Certified'],
+            labels: ['Hazard: Pending', 'In Verification', 'Resolved & Certified'],
             datasets: [{
                 data: [{{ pending }}, {{ waiting_approval }}, {{ resolved }}],
                 backgroundColor: [
-                    '#C8102E', // Hazard Red
-                    '#3A5A78', // Steel Blue
-                    '#2D6A4F'  // Verified Green
+                    '#EF4444', // Red
+                    '#3B82F6', // Blue
+                    '#10B981'  // Green
                 ],
-                borderColor: '#FFFFFF',
-                borderWidth: 2
+                borderWidth: 3,
+                borderColor: '#FFFFFF'
             }]
         },
         options: {
@@ -241,9 +267,10 @@ document.addEventListener("DOMContentLoaded", function() {
             plugins: {
                 legend: {
                     position: 'bottom',
-                    labels: { font: { family: 'IBM Plex Sans', size: 12 }, padding: 15 }
+                    labels: { font: { family: 'Plus Jakarta Sans', size: 12 }, padding: 14 }
                 }
-            }
+            },
+            cutout: '68%'
         }
     });
 });
