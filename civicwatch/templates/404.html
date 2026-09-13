@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: 404 Record Not Found{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow text-center" style="margin-top: 4rem;">
+    <div class="civic-panel" style="padding: 3rem 1.5rem;">
+        <h1 style="font-size: 3.5rem; font-weight: 700; color: var(--color-asphalt); margin: 0;">404</h1>
+        <h2 style="font-size: var(--font-size-xl); margin: 0.5rem 0 1rem 0;">Registry Record Not Found</h2>
+        <p class="text-muted" style="max-width: 480px; margin: 0 auto 1.5rem auto;">
+            The requested incident report, certificate, or municipal document does not exist or has been archived.
+        </p>
+        <a href="{% url 'home' %}" class="btn-civic btn-civic-primary">
+            <i class="fas fa-arrow-left me-1"></i> Return to Live Incident Map
+        </a>
+    </div>
+</div>
+{% endblock %}

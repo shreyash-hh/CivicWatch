@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: 500 System Error{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow text-center" style="margin-top: 4rem;">
+    <div class="civic-panel" style="padding: 3rem 1.5rem; border-top: 4px solid var(--color-pending);">
+        <h1 style="font-size: 3.5rem; font-weight: 700; color: var(--color-pending); margin: 0;">500</h1>
+        <h2 style="font-size: var(--font-size-xl); margin: 0.5rem 0 1rem 0;">Municipal Registry System Error</h2>
+        <p class="text-muted" style="max-width: 480px; margin: 0 auto 1.5rem auto;">
+            An internal server error occurred while processing this civic record. The municipal engineering team has been logged.
+        </p>
+        <a href="{% url 'home' %}" class="btn-civic btn-civic-primary">
+            <i class="fas fa-arrow-left me-1"></i> Return to Live Incident Map
+        </a>
+    </div>
+</div>
+{% endblock %}

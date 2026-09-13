@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: Public Contribution Registry{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow">
+
+    <!-- Registry Header -->
+    <div class="civic-panel" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;"><i class="fas fa-clipboard-user me-1"></i> Public Contribution Registry</h1>
+                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Official civic impact ledger recording verified reporting, remediation work, and community credits.</p>
+            </div>
+            <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Return to Incident List</a>
+        </div>
+    </div>
+
+    <!-- Section Switcher Tabs -->
+    <div class="d-flex gap-2 mb-3">
+        <button type="button" class="btn-civic btn-civic-primary" id="btn-citizens" onclick="switchLedger('citizens')">
+            <i class="fas fa-users me-1"></i> Citizen Reporters (Watchers)
+        </button>
+        <button type="button" class="btn-civic btn-civic-secondary" id="btn-heroes" onclick="switchLedger('heroes')">
+            <i class="fas fa-hand-holding-hand me-1"></i> Remediation Entities (Volunteers & NGOs)
+        </button>
+    </div>
+
+    <!-- 1. Citizens Ledger -->
+    <div id="ledger-citizens" class="civic-panel" style="padding: 0;">
+        <div class="civic-panel-header" style="background-color: var(--color-concrete); padding: 0.75rem 1rem; margin-bottom: 0;">
+            <h3 class="civic-panel-title"><i class="fas fa-bullhorn"></i> Citizen Grievance Reporting Registry</h3>
+            <span class="category-tag">Ranked by Verified Impact</span>
+        </div>
+
+        <div class="civic-table-container" style="border: none;">
+            <table class="civic-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Standing</th>
+                        <th style="width: 55%;">Citizen Account</th>
+                        <th style="width: 30%; text-align: right;">Civic Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in top_citizens %}
+                        <tr>
+                            <td>
+                                <strong>#{{ forloop.counter }}</strong>
+                            </td>
+                            <td>
+                                <a href="{% url 'public_profile' u.username %}" style="color: var(--color-asphalt); text-decoration: none; font-weight: 700;">
+                                    {{ u.username }}
+                                </a>
+                                {% if u.is_superuser %}
+                                    <span class="category-tag ms-1">Admin</span>
+                                {% endif %}
+                            </td>
+                            <td style="text-align: right;">
+                                <span class="status-badge status-badge-resolved">{{ u.civic_points }} pts</span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-4">No verified citizen credits recorded yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 2. Heroes Ledger -->
+    <div id="ledger-heroes" class="civic-panel" style="display: none; padding: 0;">
+        <div class="civic-panel-header" style="background-color: var(--color-concrete); padding: 0.75rem 1rem; margin-bottom: 0;">
+            <h3 class="civic-panel-title"><i class="fas fa-screwdriver-wrench"></i> Remediation & Public Works Registry</h3>
+            <span class="category-tag">Verified Volunteers & NGOs</span>
+        </div>
+
+        <div class="civic-table-container" style="border: none;">
+            <table class="civic-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">Standing</th>
+                        <th style="width: 45%;">Entity Name</th>
+                        <th style="width: 20%;">Role</th>
+                        <th style="width: 20%; text-align: right;">Civic Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for u in top_heroes %}
+                        <tr>
+                            <td>
+                                <strong>#{{ forloop.counter }}</strong>
+                            </td>
+                            <td>
+                                <a href="{% url 'public_profile' u.username %}" style="color: var(--color-asphalt); text-decoration: none; font-weight: 700;">
+                                    {{ u.username }}
+                                </a>
+                                {% if u.is_verified %}
+                                    <i class="fas fa-certificate text-success ms-1" title="Verified Worker"></i>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="category-tag">{{ u.get_role_display }}</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <span class="status-badge status-badge-resolved">{{ u.civic_points }} pts</span>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">No remediation entities registered yet.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchLedger(type) {
+    const cLedger = document.getElementById('ledger-citizens');
+    const hLedger = document.getElementById('ledger-heroes');
+    const cBtn = document.getElementById('btn-citizens');
+    const hBtn = document.getElementById('btn-heroes');
+
+    if (type === 'citizens') {
+        cLedger.style.display = 'block';
+        hLedger.style.display = 'none';
+        cBtn.className = 'btn-civic btn-civic-primary';
+        hBtn.className = 'btn-civic btn-civic-secondary';
+    } else {
+        cLedger.style.display = 'none';
+        hLedger.style.display = 'block';
+        cBtn.className = 'btn-civic btn-civic-secondary';
+        hBtn.className = 'btn-civic btn-civic-primary';
+    }
+}
+</script>
+{% endblock %}

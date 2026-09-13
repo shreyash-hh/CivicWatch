@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: Account Registration{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow" style="max-width: 540px; margin-top: 2rem;">
+    <div class="civic-panel">
+        <div class="civic-panel-header text-center" style="display: block;">
+            <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Citizen & Worker Registration</h1>
+            <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Create a profile to report grievances or register as a community worker</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="civic-alert civic-alert-danger">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>Please correct the errors indicated below.</div>
+                </div>
+            {% endif %}
+
+            {% for field in form %}
+                <div class="civic-form-group">
+                    <label for="{{ field.id_for_label }}" class="civic-label">{{ field.label }}:</label>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <div class="civic-help-text">{{ field.help_text|safe }}</div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.25rem;">
+                            {{ field.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-civic btn-civic-primary btn-civic-full btn-civic-lg" style="margin-top: 1rem;">
+                Complete Registration
+            </button>
+        </form>
+
+        <div style="border-top: 1px solid var(--color-border); margin-top: 1.5rem; padding-top: 1rem; text-align: center; font-size: var(--font-size-xs);">
+            <p class="text-muted" style="margin-bottom: 0.5rem;">Already have an account?</p>
+            <a href="{% url 'login' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Log In Here</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

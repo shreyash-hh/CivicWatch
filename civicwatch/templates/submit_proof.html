@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: Submit Remediation Proof #{{ v.id }}{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow">
+    <div class="civic-panel">
+        <div class="civic-panel-header">
+            <div>
+                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Submit Remediation Proof & Audit Photos</h1>
+                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Provide physical evidence of defect rectification for Incident #{{ v.id }}: <strong>{{ v.title }}</strong></p>
+            </div>
+            <a href="{% url 'violation_detail' v.id %}" class="btn-civic btn-civic-secondary btn-civic-sm">Cancel</a>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="civic-alert civic-alert-danger">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Reference Before Photo -->
+            {% if v.image %}
+                <div class="civic-panel" style="background-color: var(--color-concrete); margin-bottom: 1.5rem; padding: 1rem;">
+                    <label class="civic-label" style="font-weight: 700;">Original Defect Photograph (Reference):</label>
+                    <img src="{{ v.image.url }}" alt="Original Defect" style="max-height: 220px; width: 100%; object-fit: cover; border: 1px solid var(--color-asphalt); border-radius: var(--radius-sm);">
+                </div>
+            {% endif %}
+
+            <!-- Update Before Photo (Optional) -->
+            <div class="civic-form-group">
+                <label for="id_before_photo" class="civic-label">Update "Before" Photo (Optional):</label>
+                {{ form.before_photo }}
+                <div class="civic-help-text">Leave blank to use the original reporter's photograph.</div>
+                {% if form.before_photo.errors %}
+                    <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600;">
+                        {{ form.before_photo.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Upload After Resolution Photos -->
+            <div class="civic-form-group">
+                <label class="civic-label" style="font-weight: 700;">
+                    <i class="fas fa-camera me-1"></i> Upload "After" Completed Resolution Photos:
+                </label>
+                <input type="file" name="after_photos" class="civic-input" multiple required>
+                <div class="civic-help-text">Select one or more clear photographs demonstrating completed physical remediation. Max 5MB per image.</div>
+            </div>
+
+            <!-- Work Description Summary -->
+            <div class="civic-form-group">
+                <label for="id_work_description" class="civic-label">Remediation Log & Materials Used:</label>
+                {{ form.work_description }}
+                {% if form.work_description.errors %}
+                    <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600;">
+                        {{ form.work_description.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Submit Action -->
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-civic btn-civic-action btn-civic-lg btn-civic-full">
+                    <i class="fas fa-paper-plane me-1"></i> Submit Work Proof for Verification
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

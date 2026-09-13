@@ -1,0 +1,109 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}CivicWatch :: Municipal Issue Registry{% endblock %}</title>
+
+    <!-- Google Font: IBM Plex Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- FontAwesome for Utility Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Leaflet GIS Map CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+
+    <!-- CivicWatch Municipal Design System CSS -->
+    <link rel="stylesheet" href="{% static 'css/civicwatch.css' %}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+    <!-- Official Municipal Header -->
+    <header class="civic-nav">
+        <div class="civic-nav-inner">
+            <a href="{% url 'home' %}" class="civic-brand">
+                <span class="civic-brand-mark">CW-REG</span>
+                <span class="civic-brand-title">CivicWatch</span>
+                <span class="civic-brand-sub">Municipal Incident Registry & Resolution System</span>
+            </a>
+
+            <nav>
+                <ul class="civic-nav-links">
+                    <li><a href="{% url 'map' %}" class="civic-nav-link"><i class="fas fa-map-location-dot me-1"></i> Live Map</a></li>
+                    <li><a href="{% url 'violation_list' %}" class="civic-nav-link"><i class="fas fa-list-check me-1"></i> Incidents</a></li>
+                    <li><a href="{% url 'dashboard' %}" class="civic-nav-link"><i class="fas fa-chart-column me-1"></i> Analytics</a></li>
+                    <li><a href="{% url 'leaderboard' %}" class="civic-nav-link"><i class="fas fa-clipboard-user me-1"></i> Public Registry</a></li>
+                    
+                    {% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'profile' %}" class="civic-nav-link">
+                                <i class="fas fa-user-shield me-1"></i> {{ user.username }} 
+                                <span class="category-tag ms-1">{{ user.civic_points }} pts</span>
+                            </a>
+                        </li>
+                        <li>
+                            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-civic btn-civic-secondary btn-civic-sm">Log out</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Log in</a></li>
+                        <li><a href="{% url 'register' %}" class="btn-civic btn-civic-primary btn-civic-sm">Register</a></li>
+                    {% endif %}
+
+                    <li>
+                        <a href="{% url 'report_violation' %}" class="btn-civic btn-civic-hazard btn-civic-sm">
+                            <i class="fas fa-circle-exclamation me-1"></i> Report Incident
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Global Flash Messages -->
+    {% if messages %}
+        <div class="civic-container" style="padding-bottom: 0;">
+            {% for message in messages %}
+                <div class="civic-alert {% if message.tags == 'error' or message.tags == 'danger' %}civic-alert-danger{% elif message.tags == 'success' %}civic-alert-success{% elif message.tags == 'warning' %}civic-alert-warning{% else %}civic-alert-info{% endif %}" role="alert">
+                    <i class="fas {% if message.tags == 'error' or message.tags == 'danger' %}fa-circle-xmark{% elif message.tags == 'success' %}fa-circle-check{% elif message.tags == 'warning' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %} mt-1"></i>
+                    <div>{{ message }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content Substrate -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Official Municipal Footer -->
+    <footer class="civic-footer">
+        <div class="civic-footer-inner">
+            <div>
+                <strong>CivicWatch Municipal Infrastructure Registry</strong> &mdash; Operating in public interest for civic resolution audits.
+            </div>
+            <div>
+                <span>Standard Status Protocol: </span>
+                <span class="status-badge status-badge-pending">Hazard: Pending</span>
+                <span class="status-badge status-badge-adopted ms-1">Adopted</span>
+                <span class="status-badge status-badge-verification ms-1">Verification</span>
+                <span class="status-badge status-badge-resolved ms-1">Resolved</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

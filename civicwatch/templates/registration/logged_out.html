@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: Session Terminated{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow" style="max-width: 480px; margin-top: 3rem;">
+    <div class="civic-panel text-center" style="padding: 2.5rem 1.5rem;">
+        <i class="fas fa-right-from-bracket fa-3x text-muted mb-3" style="display: block;"></i>
+        <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.5rem 0;">Session Terminated</h1>
+        <p class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: 1.5rem;">You have successfully logged out of the CivicWatch municipal registry.</p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{% url 'login' %}" class="btn-civic btn-civic-primary">Log In Again</a>
+            <a href="{% url 'home' %}" class="btn-civic btn-civic-secondary">Public Map Explorer</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

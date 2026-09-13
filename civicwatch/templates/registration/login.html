@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: Account Login{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow" style="max-width: 480px; margin-top: 2rem;">
+    <div class="civic-panel">
+        <div class="civic-panel-header text-center" style="display: block;">
+            <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Account Login</h1>
+            <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Access the CivicWatch Municipal Reporting System</p>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            
+            {% if form.errors %}
+                <div class="civic-alert civic-alert-danger">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    <div>Invalid username or password. Please try again.</div>
+                </div>
+            {% endif %}
+
+            <div class="civic-form-group">
+                <label for="id_username" class="civic-label">Username:</label>
+                <input type="text" name="username" id="id_username" class="civic-input" autofocus required>
+            </div>
+
+            <div class="civic-form-group">
+                <label for="id_password" class="civic-label">Password:</label>
+                <input type="password" name="password" id="id_password" class="civic-input" required>
+            </div>
+
+            <button type="submit" class="btn-civic btn-civic-primary btn-civic-full btn-civic-lg">
+                Log In
+            </button>
+        </form>
+
+        <div style="border-top: 1px solid var(--color-border); margin-top: 1.5rem; padding-top: 1rem; text-align: center; font-size: var(--font-size-xs);">
+            <p class="text-muted" style="margin-bottom: 0.5rem;">Don't have an account?</p>
+            <a href="{% url 'register' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Register a New Account</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

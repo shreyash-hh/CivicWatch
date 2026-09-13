@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: Report Municipal Incident{% endblock %}
+
+{% block content %}
+<div class="civic-container-narrow">
+    <div class="civic-panel">
+        <div class="civic-panel-header">
+            <div>
+                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Official Incident Report Form</h1>
+                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Submit infrastructure defect data with GPS location and photographic evidence for municipal audit.</p>
+            </div>
+            <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">Cancel</a>
+        </div>
+
+        {% if form.non_field_errors %}
+            <div class="civic-alert civic-alert-danger">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>
+                    {% for error in form.non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data" id="reportForm">
+            {% csrf_token %}
+
+            <!-- SECTION 1: PHOTOGRAPHIC EVIDENCE (Mobile First) -->
+            <div class="civic-panel" style="background-color: var(--color-concrete); border: 2px dashed var(--color-asphalt); margin-bottom: 1.5rem; padding: 1.25rem;">
+                <label class="civic-label" style="font-size: var(--font-size-md); font-weight: 700;">
+                    <i class="fas fa-camera me-1"></i> 1. Photographic Evidence
+                </label>
+                <p class="text-muted" style="font-size: var(--font-size-xs); margin-bottom: 0.75rem;">
+                    Capture on-site photo. Metadata and personal EXIF data are automatically stripped for privacy. Max size: 5MB (JPEG, PNG, WEBP).
+                </p>
+                
+                {{ form.image }}
+                
+                <div id="imagePreviewBox" style="display: none; margin-top: 1rem; text-align: center;">
+                    <img id="imagePreview" src="#" alt="Upload preview" style="max-height: 240px; max-width: 100%; border: 2px solid var(--color-asphalt); border-radius: var(--radius-sm); object-fit: cover;">
+                </div>
+
+                {% if form.image.errors %}
+                    <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                        {{ form.image.errors|join:", " }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- SECTION 2: GEOGRAPHIC LOCATION (GPS & PIN) -->
+            <div class="civic-panel" style="background-color: var(--color-concrete); margin-bottom: 1.5rem; padding: 1.25rem;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                    <label class="civic-label" style="font-size: var(--font-size-md); font-weight: 700; margin: 0;">
+                        <i class="fas fa-map-pin me-1"></i> 2. Location & Coordinates
+                    </label>
+                    <button type="button" id="getGPSBtn" class="btn-civic btn-civic-primary btn-civic-sm">
+                        <i class="fas fa-location-crosshairs me-1"></i> Use Current GPS
+                    </button>
+                </div>
+                <p class="text-muted" style="font-size: var(--font-size-xs); margin-bottom: 0.75rem;">
+                    Drag the pin on the map to mark the exact defect location, or tap "Use Current GPS".
+                </p>
+
+                <div id="report-map" class="civic-map-report-frame" style="height: 280px;"></div>
+
+                {{ form.latitude.as_hidden }}
+                {{ form.longitude.as_hidden }}
+
+                <div class="civic-form-group" style="margin-top: 1rem; margin-bottom: 0;">
+                    <label for="id_location" class="civic-label">Street Address / Landmark / Ward:</label>
+                    {{ form.location }}
+                    {% if form.location.errors %}
+                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                            {{ form.location.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SECTION 3: INCIDENT CLASSIFICATION & DETAILS -->
+            <div class="civic-panel" style="background-color: var(--color-surface); margin-bottom: 1.5rem; padding: 1.25rem;">
+                <label class="civic-label" style="font-size: var(--font-size-md); font-weight: 700; margin-bottom: 0.75rem;">
+                    <i class="fas fa-list-check me-1"></i> 3. Incident Classification & Details
+                </label>
+
+                <div class="civic-form-group">
+                    <label for="id_category" class="civic-label">Category of Defect / Hazard:</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                            {{ form.category.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="civic-form-group">
+                    <label for="id_title" class="civic-label">Summary Title:</label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                            {{ form.title.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="civic-form-group">
+                    <label for="id_description" class="civic-label">Technical Description & Observed Hazards:</label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <div style="color: var(--color-pending); font-size: var(--font-size-xs); font-weight: 600; margin-top: 0.35rem;">
+                            {{ form.description.errors|join:", " }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <div>
+                <button type="submit" class="btn-civic btn-civic-hazard btn-civic-lg btn-civic-full" style="padding: 0.85rem;">
+                    <i class="fas fa-file-signature me-1"></i> Submit Official Incident Report
+                </button>
+                <div class="civic-help-text text-center" style="margin-top: 0.5rem;">
+                    By submitting, this report is logged to the public civic audit registry.
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Image Preview
+    const imageInput = document.getElementById('id_image');
+    const previewBox = document.getElementById('imagePreviewBox');
+    const previewImg = document.getElementById('imagePreview');
+
+    if (imageInput) {
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    previewBox.style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    // Leaflet Pin Dropper
+    const latInput = document.getElementById('id_latitude');
+    const lngInput = document.getElementById('id_longitude');
+    const locInput = document.getElementById('id_location');
+
+    const defaultLat = latInput.value ? parseFloat(latInput.value) : 18.5204;
+    const defaultLng = lngInput.value ? parseFloat(lngInput.value) : 73.8567;
+
+    const reportMap = L.map('report-map').setView([defaultLat, defaultLng], 14);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(reportMap);
+
+    const pinIcon = L.divIcon({
+        className: 'custom-leaflet-marker',
+        html: `<div style="
+            background-color: #C8102E;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 2px solid #FFFFFF;
+            box-shadow: 0 0 0 2px #2B2B2B;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #FFFFFF;
+            font-size: 12px;
+        "><i class="fas fa-location-crosshairs"></i></div>`,
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+    });
+
+    let marker = L.marker([defaultLat, defaultLng], {
+        draggable: true,
+        icon: pinIcon
+    }).addTo(reportMap);
+
+    function updateCoordinates(lat, lng) {
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+        
+        // Reverse Geocoding via Nominatim
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name && !locInput.value) {
+                    locInput.value = data.display_name.split(',').slice(0, 3).join(', ');
+                }
+            })
+            .catch(() => {});
+    }
+
+    // Set initial values if not set
+    if (!latInput.value || !lngInput.value) {
+        updateCoordinates(defaultLat, defaultLng);
+    }
+
+    marker.on('dragend', function(e) {
+        const pos = marker.getLatLng();
+        updateCoordinates(pos.lat, pos.lng);
+    });
+
+    reportMap.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateCoordinates(e.latlng.lat, e.latlng.lng);
+    });
+
+    // GPS Button
+    const gpsBtn = document.getElementById('getGPSBtn');
+    if (gpsBtn && navigator.geolocation) {
+        gpsBtn.addEventListener('click', function() {
+            gpsBtn.innerText = "Locating...";
+            navigator.geolocation.getCurrentPosition(
+                function(pos) {
+                    const userLat = pos.coords.latitude;
+                    const userLng = pos.coords.longitude;
+                    reportMap.setView([userLat, userLng], 16);
+                    marker.setLatLng([userLat, userLng]);
+                    updateCoordinates(userLat, userLng);
+                    gpsBtn.innerHTML = '<i class="fas fa-location-crosshairs me-1"></i> GPS Locked';
+                },
+                function(err) {
+                    alert("Unable to retrieve GPS location. Please drag the pin on the map.");
+                    gpsBtn.innerHTML = '<i class="fas fa-location-crosshairs me-1"></i> Use Current GPS';
+                },
+                { enableHighAccuracy: true, timeout: 8000 }
+            );
+        });
+    }
+});
+</script>
+{% endblock %}

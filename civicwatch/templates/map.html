@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CivicWatch :: Live Incident Map Registry{% endblock %}
+
+{% block content %}
+<div class="civic-container">
+    <div class="civic-panel" style="padding: 1rem 1.25rem; margin-bottom: 1rem;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+                <h1 style="font-size: var(--font-size-xl); margin: 0 0 0.25rem 0;">Incident Geographic Registry</h1>
+                <p class="text-muted" style="font-size: var(--font-size-xs); margin: 0;">Live tracking of public works complaints, adoptions, and resolutions.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'violation_list' %}" class="btn-civic btn-civic-secondary btn-civic-sm">
+                    <i class="fas fa-list-check me-1"></i> List View
+                </a>
+                <a href="{% url 'report_violation' %}" class="btn-civic btn-civic-hazard btn-civic-sm">
+                    <i class="fas fa-circle-exclamation me-1"></i> Report Incident
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Filter Toolbar -->
+    <div class="civic-panel" style="padding: 0.65rem 1rem; margin-bottom: 1rem; background-color: var(--color-concrete);">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2" style="font-size: var(--font-size-xs);">
+            <div class="d-flex align-items-center gap-2">
+                <strong>Status Filter:</strong>
+                <button type="button" class="btn-civic btn-civic-secondary btn-civic-sm filter-btn active" data-filter="all">All Incidents</button>
+                <button type="button" class="btn-civic btn-civic-sm filter-btn status-badge-pending" data-filter="Pending" style="border: 1px solid var(--color-pending);">Pending</button>
+                <button type="button" class="btn-civic btn-civic-sm filter-btn status-badge-adopted" data-filter="Adopted">Adopted</button>
+                <button type="button" class="btn-civic btn-civic-sm filter-btn status-badge-verification" data-filter="Pending Verification">Verification</button>
+                <button type="button" class="btn-civic btn-civic-sm filter-btn status-badge-resolved" data-filter="Resolved">Resolved</button>
+            </div>
+            <div id="marker-count" class="text-muted">Loading incidents...</div>
+        </div>
+    </div>
+
+    <!-- Map Viewport -->
+    <div class="civic-panel" style="padding: 0.5rem;">
+        <div id="full-screen-map" class="civic-map-frame" style="height: 600px;"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const map = L.map('full-screen-map').setView([18.5204, 73.8567], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const statusColors = {
+        'Pending': '#C8102E',
+        'Adopted': '#E8A33D',
+        'Pending Verification': '#3A5A78',
+        'Resolved': '#2D6A4F',
+        'Rejected': '#7A1C1C'
+    };
+
+    let allMarkers = [];
+
+    function createStatusPin(status) {
+        const color = statusColors[status] || '#2B2B2B';
+        const isAmber = status === 'Adopted';
+        const textColor = isAmber ? '#2B2B2B' : '#FFFFFF';
+
+        return L.divIcon({
+            className: 'custom-leaflet-marker',
+            html: `<div style="
+                background-color: ${color};
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                border: 2px solid #FFFFFF;
+                box-shadow: 0 0 0 1.5px #2B2B2B;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: ${textColor};
+                font-size: 11px;
+                font-weight: 700;
+            "><i class="fas fa-location-dot"></i></div>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 12],
+            popupAnchor: [0, -14]
+        });
+    }
+
+    fetch("{% url 'api_violation_list' %}")
+        .then(res => res.json())
+        .then(violations => {
+            const countEl = document.getElementById('marker-count');
+            if (countEl) countEl.innerText = `${violations.length} incidents plotted`;
+
+            violations.forEach(v => {
+                if (v.latitude && v.longitude) {
+                    const icon = createStatusPin(v.status);
+                    const marker = L.marker([v.latitude, v.longitude], { icon: icon });
+                    marker.violationData = v;
+
+                    const badgeClass = v.status === 'Pending' ? 'status-badge-pending' :
+                                       v.status === 'Adopted' ? 'status-badge-adopted' :
+                                       v.status === 'Pending Verification' ? 'status-badge-verification' :
+                                       v.status === 'Resolved' ? 'status-badge-resolved' : 'status-badge-rejected';
+
+                    marker.bindPopup(`
+                        <div style="font-family: 'IBM Plex Sans', sans-serif; min-width: 200px;">
+                            <div style="margin-bottom: 4px;">
+                                <span class="status-badge ${badgeClass}" style="font-size: 10px; padding: 2px 6px;">${v.status}</span>
+                                <span class="category-tag" style="font-size: 10px;">${v.category}</span>
+                            </div>
+                            <h4 style="font-size: 13px; font-weight: 700; margin: 4px 0 6px 0; color: #2B2B2B;">${v.title}</h4>
+                            <a href="${v.url}" class="btn-civic btn-civic-primary btn-civic-sm" style="font-size: 11px; width: 100%; text-align: center; box-sizing: border-box; display: block;">Inspect Incident</a>
+                        </div>
+                    `);
+
+                    marker.addTo(map);
+                    allMarkers.push(marker);
+                }
+            });
+
+            if (allMarkers.length > 0) {
+                const group = new L.featureGroup(allMarkers);
+                map.fitBounds(group.getBounds().pad(0.15));
+            }
+        })
+        .catch(err => console.error("Error fetching map violations:", err));
+
+    // Filter Button Handler
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            allMarkers.forEach(m => {
+                if (filter === 'all' || m.violationData.status === filter) {
+                    m.addTo(map);
+                } else {
+                    map.removeLayer(m);
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}
