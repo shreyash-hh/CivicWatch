@@ -133,7 +133,13 @@
                 <div class="showcase-media-frame">
                     {% if v.submission and v.submission.after_photos.exists %}
                         {% for img in v.submission.after_photos.all %}
-                            <img src="{{ img.image.url }}" alt="After proof {{ forloop.counter }}" class="showcase-img" style="{% if not forloop.first %}display:none;{% endif %}" id="after-photo-view-{{ forloop.counter }}">
+                            {% if img.image %}<img src="{{ img.image.url }}" alt="After proof {{ forloop.counter }}" class="showcase-img" style="{% if not forloop.first %}display:none;{% endif %}" id="after-photo-view-{{ forloop.counter }}">{% endif %}
+                        {% empty %}
+                        <div class="text-center p-4" style="color: #94A3B8;">
+                            <i class="fas fa-screwdriver-wrench fa-3x mb-3" style="display:block;"></i>
+                            <strong>Remediation In Progress</strong>
+                            <p style="font-size: 0.8125rem; margin: 0.35rem 0 0 0;">Physical proof of work will be uploaded upon defect resolution.</p>
+                        </div>
                         {% endfor %}
                     {% else %}
                         <div class="text-center p-4" style="color: #94A3B8;">
